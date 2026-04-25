@@ -272,8 +272,11 @@
     /* 題目 */
     .q-card { padding: 20px 16px; }
     .q-text { font-size: 20px; }
-    .ans-input { font-size: 18px; padding: 12px; }
-    .btn-primary { padding: 12px 14px; font-size: 14px; }
+
+    /* 輸入框＋按鈕：手機改直排 */
+    .ans-row { flex-direction: column; gap: 8px; }
+    .ans-input { font-size: 20px; padding: 16px; width: 100%; }
+    .btn-primary { width: 100%; padding: 14px; font-size: 15px; text-align: center; }
 
     /* 分數 grid 2欄 */
     .frac-grid { grid-template-columns: repeat(2,1fr); gap: 8px; }
@@ -290,6 +293,9 @@
     .shift-wrap input  { width: 100%; }
     .shift-wrap select { width: 100%; }
     .shift-result { font-size: 18px; }
+
+    /* 分數練習的輸入行也直排 */
+    .frac-q-box + .ans-row { flex-direction: column; }
 
     /* 結果 */
     .result-card { padding: 24px 20px; }
