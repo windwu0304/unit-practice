@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小四單位換算練習</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --card: #ffffff;
+    --border: #ddd;
+    --text: #1c1c1c;
+    --text-mid: #555;
+    --text-light: #888;
+    --accent: #2d6be4;
+    --accent-light: #eef3fd;
+    --green: #1a7f4b;
+    --green-bg: #f0faf4;
+    --red: #c0392b;
+    --red-bg: #fdf3f2;
+    --tag-weight: #7b4f2e;
+    --tag-weight-bg: #fdf5ef;
+    --tag-length: #1a5f7a;
+    --tag-length-bg: #eef7fb;
+    --tag-volume: #2e6b4f;
+    --tag-volume-bg: #eef8f3;
+    --tag-area: #5a3e8a;
+    --tag-area-bg: #f5f0fb;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .header-inner {
+    max-width: 640px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .header-title { font-size: 18px; font-weight: 700; }
+  .header-sub   { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+  .score-row    { display: flex; gap: 8px; }
+  .score-chip {
+    font-size: 13px; color: var(--text-mid);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 12px;
+  }
+  .score-chip span { font-weight: 700; color: var(--text); }
+
+  .tab-bar {
+    background: white; border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-inner { max-width: 640px; margin: 0 auto; display: flex; }
+  .tab-btn {
+    flex: 1; min-width: 80px; padding: 12px 8px;
+    background: none; border: none; border-bottom: 2px solid transparent;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px; font-weight: 500; color: var(--text-light);
+    cursor: pointer; transition: all 0.12s; white-space: nowrap;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+  .tab-btn:hover:not(.active) { color: var(--text-mid); }
+
+  .main { max-width: 640px; margin: 0 auto; padding: 20px 16px 48px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card {
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px; margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 12px; font-weight: 700; color: var(--text-light);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;
+  }
+
+  /* Ladder */
+  .ladder-row {
+    display: flex; align-items: center;
+    overflow-x: auto; padding-bottom: 4px;
+  }
+  .ladder-row::-webkit-scrollbar { height: 4px; }
+  .ladder-row::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .l-unit {
+    flex-shrink: 0;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; text-align: center; background: white; min-width: 72px;
+  }
+  .l-unit .u-name { font-size: 15px; font-weight: 700; }
+  .l-unit .u-sym  { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .l-unit.weight { background: var(--tag-weight-bg); border-color: #d4b49a; color: var(--tag-weight); }
+  .l-unit.length { background: var(--tag-length-bg); border-color: #9ecfe0; color: var(--tag-length); }
+  .l-unit.volume { background: var(--tag-volume-bg); border-color: #9ed4be; color: var(--tag-volume); }
+  .l-unit.area   { background: var(--tag-area-bg);   border-color: #c4aee0; color: var(--tag-area); }
+
+  .l-gap {
+    flex-shrink: 0; display: flex; flex-direction: column;
+    align-items: center; min-width: 68px;
+    font-size: 11px; font-weight: 600; gap: 4px;
+  }
+  .l-gap .up { color: var(--green); }
+  .l-gap .dn { color: var(--red); }
+
+  .info-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 12px; color: var(--text-mid); margin-top: 12px; line-height: 1.8;
+  }
+
+  /* Quiz */
+  .cat-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .cat-btn {
+    padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+    background: white; font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px; font-weight: 500; color: var(--text-mid); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cat-btn.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+
+  .prog-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
+  .prog-bar { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.35s ease; }
+
+  .q-card {
+    background: white; border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px 20px; margin-bottom: 16px; text-align: center;
+  }
+  .q-tag {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    padding: 4px 8px; border-radius: 4px; margin-bottom: 12px;
+  }
+  .q-tag.weight { background: var(--tag-weight-bg); color: var(--tag-weight); }
+  .q-tag.length { background: var(--tag-length-bg); color: var(--tag-length); }
+  .q-tag.volume { background: var(--tag-volume-bg); color: var(--tag-volume); }
+  .q-tag.area   { background: var(--tag-area-bg);   color: var(--tag-area); }
+
+  .q-text { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .q-hint { font-size: 12px; color: var(--text-light); margin-top: 8px; display: none; }
+
+  .ans-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .ans-input {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-size: 20px; font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif; color: var(--text);
+    outline: none; text-align: center; background: white; transition: border-color 0.12s;
+  }
+  .ans-input:focus   { border-color: var(--accent); }
+  .ans-input.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .ans-input.wrong   { border-color: var(--red);   background: var(--red-bg);   color: var(--red); }
+
+  .btn-primary {
+    padding: 12px 20px; background: var(--accent); color: white;
+    border: none; border-radius: 8px;
+    font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.12s; white-space: nowrap;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .feedback {
+    border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 600;
+    display: none; margin-bottom: 12px;
+  }
+  .feedback.correct { background: var(--green-bg); color: var(--green); border: 1px solid #aaddc4; display: block; }
+  .feedback.wrong   { background: var(--red-bg);   color: var(--red);   border: 1px solid #f0b8b4; display: block; }
+  .hint-block {
+    background: white; border-radius: 8px;
+    padding: 12px 16px; margin-top: 4px;
+    font-size: 14px; font-weight: 400;
+    color: var(--text); line-height: 1.9;
+  }
+  .hint-block strong { color: var(--accent); font-size: 16px; }
+
+  .btn-next {
+    width: 100%; padding: 12px; background: white; color: var(--text);
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; display: none; transition: border-color 0.12s;
+  }
+  .btn-next:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-next.show  { display: block; }
+
+  /* Decimal */
+  .rule-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .rule-table th {
+    background: var(--bg); font-size: 12px; font-weight: 700; color: var(--text-light);
+    padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .rule-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .rule-table tr:last-child td { border-bottom: none; }
+  .op-cell { font-weight: 700; white-space: nowrap; }
+  .dir-cell { color: var(--text-mid); font-size: 13px; }
+  .eg-cell  { font-weight: 700; color: var(--accent); }
+
+  .shift-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .shift-wrap input, .shift-wrap select {
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-family: 'Noto Sans TC', sans-serif;
+    font-size: 15px; font-weight: 700; outline: none; background: white; color: var(--text);
+  }
+  .shift-wrap input  { width: 100px; text-align: center; }
+  .shift-wrap select { flex: 1; min-width: 160px; cursor: pointer; font-size: 14px; }
+  .shift-result {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; font-size: 20px; font-weight: 700; text-align: center;
+  }
+  .shift-result .hi { color: var(--accent); }
+
+  /* Fraction */
+  .frac-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 8px; }
+  .frac-card {
+    background: white; border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 12px; text-align: center;
+  }
+  .frac-n { font-size: 20px; font-weight: 700; border-bottom: 2px solid var(--text); display: inline-block; padding: 0 8px; line-height: 1.2; }
+  .frac-d { font-size: 20px; font-weight: 700; }
+  .frac-eq  { font-size: 12px; color: var(--text-light); margin: 8px 0 4px; }
+  .frac-dec { font-size: 22px; font-weight: 700; color: var(--accent); }
+
+  /* Results */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3); z-index: 100;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .result-card {
+    background: white; border-radius: 12px; padding: 32px 24px;
+    max-width: 300px; width: 100%; text-align: center;
+  }
+  .result-icon  { font-size: 44px; margin-bottom: 12px; }
+  .result-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .result-score { font-size: 36px; font-weight: 700; color: var(--accent); margin: 8px 0; }
+  .result-msg   { font-size: 14px; color: var(--text-mid); margin-bottom: 20px; }
+
+  @media (max-width: 480px) {
+    .q-text { font-size: 20px; }
+    .frac-grid { grid-template-columns: repeat(2,1fr); }
+    .score-row { display: none; }
+  }
+
+  /* Rule card */
+  .rule-card { border-left: 3px solid var(--accent); }
+  .rule-heading { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .rule-body { font-size: 14px; line-height: 2.2; color: var(--text-mid); }
+  .rule-body strong { color: var(--text); }
+  .rule-eg {
+    font-size: 13px; color: var(--text-light);
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+  }
+
+  /* Error list */
+  .error-list { font-size: 13px; line-height: 2.4; color: var(--text-mid); }
+
+  /* Fraction quiz */
+  .frac-q-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px;
+    margin-bottom: 12px;
+  }
+  .frac-q-meta { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
+  .frac-q-text { font-size: 20px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-title">單位換算練習</div>
+      <div class="header-sub">小學四年級・長度・重量・容量・面積</div>
+    </div>
+    <div class="score-row">
+      <div class="score-chip">答對 <span id="correctCount">0</span> 題</div>
+      <div class="score-chip">連續 <span id="streakCount">0</span> 題</div>
+    </div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab-inner">
+    <button class="tab-btn active" onclick="switchTab('ladder',this)">換算梯</button>
+    <button class="tab-btn" onclick="switchTab('quiz',this)">練習題</button>
+    <button class="tab-btn" onclick="switchTab('decimal',this)">小數移位</button>
+    <button class="tab-btn" onclick="switchTab('fraction',this)">分數橋接</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 換算梯 -->
+  <div id="tab-ladder" class="section active">
+
+    <div class="card">
+      <div class="card-title">⚖️ 重量</div>
+      <div class="ladder-row">
+        <div class="l-unit weight"><div class="u-name">公斤</div><div class="u-sym">kg</div></div>
+        <div class="l-gap"><div class="up">×1000 ↑</div><div class="dn">↓ ÷1000</div></div>
+        <div class="l-unit weight"><div class="u-name">公克</div><div class="u-sym">g</div></div>
+        <div class="l-gap"><div class="up">×1000 ↑</div><div class="dn">↓ ÷1000</div></div>
+        <div class="l-unit weight"><div class="u-name">毫克</div><div class="u-sym">mg</div></div>
+      </div>
+      <div class="info-box">1公斤 = 1000公克 ／ 1公克 = 1000毫克<br>例：一顆蘋果約 200公克、一袋砂糖 1公斤</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📏 長度</div>
+      <div class="ladder-row">
+        <div class="l-unit length"><div class="u-name">公里</div><div class="u-sym">km</div></div>
+        <div class="l-gap"><div class="up">×1000 ↑</div><div class="dn">↓ ÷1000</div></div>
+        <div class="l-unit length"><div class="u-name">公尺</div><div class="u-sym">m</div></div>
+        <div class="l-gap"><div class="up">×100 ↑</div><div class="dn">↓ ÷100</div></div>
+        <div class="l-unit length"><div class="u-name">公分</div><div class="u-sym">cm</div></div>
+        <div class="l-gap"><div class="up">×10 ↑</div><div class="dn">↓ ÷10</div></div>
+        <div class="l-unit length"><div class="u-name">公厘</div><div class="u-sym">mm</div></div>
+      </div>
+      <div class="info-box">1公里 = 1000公尺 ／ 1公尺 = 100公分 ／ 1公分 = 10公厘<br>例：走路15分鐘約1公里、教室門高約2公尺</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧴 容量</div>
+      <div class="ladder-row">
+        <div class="l-unit volume"><div class="u-name">公升</div><div class="u-sym">L</div></div>
+        <div class="l-gap"><div class="up">×10 ↑</div><div class="dn">↓ ÷10</div></div>
+        <div class="l-unit volume"><div class="u-name">分升</div><div class="u-sym">dL</div></div>
+        <div class="l-gap"><div class="up">×100 ↑</div><div class="dn">↓ ÷100</div></div>
+        <div class="l-unit volume"><div class="u-name">毫升</div><div class="u-sym">mL</div></div>
+      </div>
+      <div class="info-box">1公升 = 10分升 = 1000毫升<br>例：大瓶礦泉水 = 1公升 = 1000毫升</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🟦 面積</div>
+      <div class="ladder-row">
+        <div class="l-unit area"><div class="u-name">平方公尺</div><div class="u-sym">m²</div></div>
+        <div class="l-gap"><div class="up">×10000 ↑</div><div class="dn">↓ ÷10000</div></div>
+        <div class="l-unit area"><div class="u-name">平方公分</div><div class="u-sym">cm²</div></div>
+      </div>
+      <div class="info-box">1平方公尺 = 10000平方公分（100 × 100）<br>例：一張課桌面約 2400平方公分</div>
+    </div>
+
+    <div class="card rule-card">
+      <div class="rule-heading">記住這個方向</div>
+      <div class="rule-body">
+        大單位 → 小單位：數字變<strong>大</strong>，要 <strong>× 乘</strong><br>
+        小單位 → 大單位：數字變<strong>小</strong>，要 <strong>÷ 除</strong>
+      </div>
+      <div class="rule-eg">
+        例：3 公斤 → 公克（大→小）= 3 × 1000 = 3000 公克
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 練習題 -->
+  <div id="tab-quiz" class="section">
+    <div class="cat-row">
+      <button class="cat-btn active" onclick="selectCat('all',this)">全部</button>
+      <button class="cat-btn" onclick="selectCat('length',this)">長度</button>
+      <button class="cat-btn" onclick="selectCat('weight',this)">重量</button>
+      <button class="cat-btn" onclick="selectCat('volume',this)">容量</button>
+      <button class="cat-btn" onclick="selectCat('area',this)">面積</button>
+    </div>
+
+    <div class="prog-row">
+      <span>第 <span id="qNum">1</span> 題</span>
+      <span><span id="qAnswered">0</span> / <span id="qTotal">10</span> 已作答</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+    <div class="q-card">
+      <div class="q-tag" id="qTag">重量</div>
+      <div class="q-text" id="qText">載入中...</div>
+      <div class="q-hint" id="qHint"></div>
+    </div>
+
+    <div class="ans-row">
+      <input type="number" class="ans-input" id="ansInput" placeholder="填入答案" step="any"
+        onkeydown="if(event.key==='Enter') checkAns()">
+      <button class="btn-primary" onclick="checkAns()">確認</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-next" id="btnNext" onclick="nextQ()">下一題 →</button>
+  </div>
+
+  <!-- 小數移位 -->
+  <div id="tab-decimal" class="section">
+    <div class="card">
+      <div class="card-title">規則總表</div>
+      <table class="rule-table">
+        <tr><th>操作</th><th>小數點方向</th><th>例子</th></tr>
+        <tr><td class="op-cell">× 1000</td><td class="dir-cell">右移 3 格</td><td class="eg-cell">1.5 → 1500</td></tr>
+        <tr><td class="op-cell">× 100</td> <td class="dir-cell">右移 2 格</td><td class="eg-cell">2.3 → 230</td></tr>
+        <tr><td class="op-cell">× 10</td>  <td class="dir-cell">右移 1 格</td><td class="eg-cell">4.7 → 47</td></tr>
+        <tr><td class="op-cell">÷ 10</td>  <td class="dir-cell">左移 1 格</td><td class="eg-cell">28 → 2.8</td></tr>
+        <tr><td class="op-cell">÷ 100</td> <td class="dir-cell">左移 2 格</td><td class="eg-cell">350 → 3.5</td></tr>
+        <tr><td class="op-cell">÷ 1000</td><td class="dir-cell">左移 3 格</td><td class="eg-cell">5000 → 5</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">互動練習</div>
+      <div class="shift-wrap">
+        <input type="number" id="shiftNum" value="3.5" step="any" oninput="calcShift()">
+        <select id="shiftOp" onchange="calcShift()">
+          <option value="m1000">× 1000（右移3格）</option>
+          <option value="m100">× 100（右移2格）</option>
+          <option value="m10">× 10（右移1格）</option>
+          <option value="d10">÷ 10（左移1格）</option>
+          <option value="d100">÷ 100（左移2格）</option>
+          <option value="d1000">÷ 1000（左移3格）</option>
+        </select>
+      </div>
+      <div class="shift-result" id="shiftResult">3.5 × 1000 = <span class="hi">3500</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">常見錯誤</div>
+      <div class="error-list">
+        ❌ &nbsp;3 公尺 ÷ 100 = 0.03 公分<br>
+        ✅ &nbsp;3 公尺 × 100 = 300 公分 &nbsp;← 大→小，要乘<br>
+        ❌ &nbsp;2500 公克 × 1000 = 2500000 公斤<br>
+        ✅ &nbsp;2500 公克 ÷ 1000 = 2.5 公斤 &nbsp;← 小→大，要除
+      </div>
+    </div>
+  </div>
+
+  <!-- 分數橋接 -->
+  <div id="tab-fraction" class="section">
+    <div class="card">
+      <div class="card-title">常用分數 = 小數</div>
+      <div class="frac-grid">
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">2</div><div class="frac-eq">等於</div><div class="frac-dec">0.5</div></div>
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">4</div><div class="frac-eq">等於</div><div class="frac-dec">0.25</div></div>
+        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">4</div><div class="frac-eq">等於</div><div class="frac-dec">0.75</div></div>
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">5</div><div class="frac-eq">等於</div><div class="frac-dec">0.2</div></div>
+        <div class="frac-card"><div><span class="frac-n">2</span></div><div class="frac-d">5</div><div class="frac-eq">等於</div><div class="frac-dec">0.4</div></div>
+        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">5</div><div class="frac-eq">等於</div><div class="frac-dec">0.6</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">分數換算練習</div>
+      <div class="frac-q-box">
+        <div class="frac-q-meta" id="fracMeta">重量</div>
+        <div class="frac-q-text" id="fracText">載入中...</div>
+      </div>
+      <div class="ans-row">
+        <input type="number" step="any" id="fracAnsInput"
+          class="ans-input"
+          placeholder="填入答案"
+          onkeydown="if(event.key==='Enter') checkFrac()">
+        <button onclick="checkFrac()" class="btn-primary">確認</button>
+      </div>
+      <div id="fracFb" class="feedback"></div>
+      <button id="fracNext" class="btn-next" onclick="nextFrac()">下一題 →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Results overlay -->
+<div class="overlay" id="overlay">
+  <div class="result-card">
+    <div class="result-icon" id="rIcon">🎉</div>
+    <div class="result-title" id="rTitle">練習完成！</div>
+    <div class="result-score" id="rScore">8 / 10</div>
+    <div class="result-msg" id="rMsg">很棒，繼續加油！</div>
+    <button class="btn-primary" style="width:100%" onclick="restartQuiz()">再練一次</button>
+  </div>
+</div>
+
+<script>
+const S = { correct:0, streak:0, qCount:0, qTotal:10, cat:'all', curQ:null, answered:false, fracQ:null, fracDone:false };
+
+const Qs = [
+  {cat:'length', text:'3 公里 = ? 公尺',    ans:3000,  hint:'公里換公尺，是大單位換小單位，所以數字要變大，用乘法。<br>1 公里 = 1000 公尺，所以：<br>3 × 1000 = <strong>3000 公尺</strong>'},
+  {cat:'length', text:'250 公分 = ? 公尺',  ans:2.5,   hint:'公分換公尺，是小單位換大單位，所以數字要變小，用除法。<br>100 公分 = 1 公尺，所以：<br>250 ÷ 100 = <strong>2.5 公尺</strong>'},
+  {cat:'length', text:'1.5 公尺 = ? 公分',  ans:150,   hint:'公尺換公分，是大單位換小單位，所以數字要變大，用乘法。<br>1 公尺 = 100 公分，所以：<br>1.5 × 100 = <strong>150 公分</strong>'},
+  {cat:'length', text:'5000 公尺 = ? 公里', ans:5,     hint:'公尺換公里，是小單位換大單位，所以數字要變小，用除法。<br>1000 公尺 = 1 公里，所以：<br>5000 ÷ 1000 = <strong>5 公里</strong>'},
+  {cat:'length', text:'8 公分 = ? 公厘',    ans:80,    hint:'公分換公厘，是大單位換小單位，所以數字要變大，用乘法。<br>1 公分 = 10 公厘，所以：<br>8 × 10 = <strong>80 公厘</strong>'},
+  {cat:'length', text:'45 公厘 = ? 公分',   ans:4.5,   hint:'公厘換公分，是小單位換大單位，所以數字要變小，用除法。<br>10 公厘 = 1 公分，所以：<br>45 ÷ 10 = <strong>4.5 公分</strong>'},
+  {cat:'length', text:'2.5 公里 = ? 公尺',  ans:2500,  hint:'公里換公尺，是大單位換小單位，數字要變大，用乘法。<br>1 公里 = 1000 公尺，所以：<br>2.5 × 1000 = <strong>2500 公尺</strong>'},
+  {cat:'length', text:'0.5 公尺 = ? 公分',  ans:50,    hint:'公尺換公分，是大單位換小單位，數字要變大，用乘法。<br>1 公尺 = 100 公分，所以：<br>0.5 × 100 = <strong>50 公分</strong>'},
+  {cat:'length', text:'1200 公分 = ? 公尺', ans:12,    hint:'公分換公尺，是小單位換大單位，數字要變小，用除法。<br>100 公分 = 1 公尺，所以：<br>1200 ÷ 100 = <strong>12 公尺</strong>'},
+  {cat:'weight', text:'3 公斤 = ? 公克',    ans:3000,  hint:'公斤換公克，是大單位換小單位，數字要變大，用乘法。<br>1 公斤 = 1000 公克，所以：<br>3 × 1000 = <strong>3000 公克</strong>'},
+  {cat:'weight', text:'2500 公克 = ? 公斤', ans:2.5,   hint:'公克換公斤，是小單位換大單位，數字要變小，用除法。<br>1000 公克 = 1 公斤，所以：<br>2500 ÷ 1000 = <strong>2.5 公斤</strong>'},
+  {cat:'weight', text:'0.5 公斤 = ? 公克',  ans:500,   hint:'公斤換公克，是大單位換小單位，數字要變大，用乘法。<br>1 公斤 = 1000 公克，所以：<br>0.5 × 1000 = <strong>500 公克</strong>'},
+  {cat:'weight', text:'4.2 公斤 = ? 公克',  ans:4200,  hint:'公斤換公克，是大單位換小單位，數字要變大，用乘法。<br>1 公斤 = 1000 公克，所以：<br>4.2 × 1000 = <strong>4200 公克</strong>'},
+  {cat:'weight', text:'750 公克 = ? 公斤',  ans:0.75,  hint:'公克換公斤，是小單位換大單位，數字要變小，用除法。<br>1000 公克 = 1 公斤，所以：<br>750 ÷ 1000 = <strong>0.75 公斤</strong>'},
+  {cat:'weight', text:'5000 公克 = ? 公斤', ans:5,     hint:'公克換公斤，是小單位換大單位，數字要變小，用除法。<br>1000 公克 = 1 公斤，所以：<br>5000 ÷ 1000 = <strong>5 公斤</strong>'},
+  {cat:'weight', text:'1500 公克 = ? 公斤', ans:1.5,   hint:'公克換公斤，是小單位換大單位，數字要變小，用除法。<br>1000 公克 = 1 公斤，所以：<br>1500 ÷ 1000 = <strong>1.5 公斤</strong>'},
+  {cat:'weight', text:'0.25 公斤 = ? 公克', ans:250,   hint:'公斤換公克，是大單位換小單位，數字要變大，用乘法。<br>1 公斤 = 1000 公克，所以：<br>0.25 × 1000 = <strong>250 公克</strong>'},
+  {cat:'volume', text:'2 公升 = ? 毫升',    ans:2000,  hint:'公升換毫升，是大單位換小單位，數字要變大，用乘法。<br>1 公升 = 1000 毫升，所以：<br>2 × 1000 = <strong>2000 毫升</strong>'},
+  {cat:'volume', text:'500 毫升 = ? 公升',  ans:0.5,   hint:'毫升換公升，是小單位換大單位，數字要變小，用除法。<br>1000 毫升 = 1 公升，所以：<br>500 ÷ 1000 = <strong>0.5 公升</strong>'},
+  {cat:'volume', text:'1.5 公升 = ? 毫升',  ans:1500,  hint:'公升換毫升，是大單位換小單位，數字要變大，用乘法。<br>1 公升 = 1000 毫升，所以：<br>1.5 × 1000 = <strong>1500 毫升</strong>'},
+  {cat:'volume', text:'250 毫升 = ? 公升',  ans:0.25,  hint:'毫升換公升，是小單位換大單位，數字要變小，用除法。<br>1000 毫升 = 1 公升，所以：<br>250 ÷ 1000 = <strong>0.25 公升</strong>'},
+  {cat:'volume', text:'3 公升 = ? 分升',    ans:30,    hint:'公升換分升，是大單位換小單位，數字要變大，用乘法。<br>1 公升 = 10 分升，所以：<br>3 × 10 = <strong>30 分升</strong>'},
+  {cat:'volume', text:'40 分升 = ? 公升',   ans:4,     hint:'分升換公升，是小單位換大單位，數字要變小，用除法。<br>10 分升 = 1 公升，所以：<br>40 ÷ 10 = <strong>4 公升</strong>'},
+  {cat:'volume', text:'0.75 公升 = ? 毫升', ans:750,   hint:'公升換毫升，是大單位換小單位，數字要變大，用乘法。<br>1 公升 = 1000 毫升，所以：<br>0.75 × 1000 = <strong>750 毫升</strong>'},
+  {cat:'volume', text:'600 毫升 = ? 分升',  ans:6,     hint:'毫升換分升，是小單位換大單位，數字要變小，用除法。<br>100 毫升 = 1 分升，所以：<br>600 ÷ 100 = <strong>6 分升</strong>'},
+  {cat:'area', text:'2 平方公尺 = ? 平方公分',     ans:20000, hint:'平方公尺換平方公分，數字要變大，用乘法。<br>1 公尺 = 100 公分，所以 1 平方公尺 = 100 × 100 = 10000 平方公分。<br>2 × 10000 = <strong>20000 平方公分</strong>'},
+  {cat:'area', text:'50000 平方公分 = ? 平方公尺', ans:5,     hint:'平方公分換平方公尺，數字要變小，用除法。<br>10000 平方公分 = 1 平方公尺，所以：<br>50000 ÷ 10000 = <strong>5 平方公尺</strong>'},
+  {cat:'area', text:'0.5 平方公尺 = ? 平方公分',   ans:5000,  hint:'平方公尺換平方公分，數字要變大，用乘法。<br>1 平方公尺 = 10000 平方公分，所以：<br>0.5 × 10000 = <strong>5000 平方公分</strong>'},
+  {cat:'area', text:'1 平方公尺 = ? 平方公分',     ans:10000, hint:'1 公尺 = 100 公分，面積要把長和寬都換掉。<br>100 × 100 = <strong>10000 平方公分</strong>'},
+  {cat:'area', text:'30000 平方公分 = ? 平方公尺', ans:3,     hint:'平方公分換平方公尺，數字要變小，用除法。<br>10000 平方公分 = 1 平方公尺，所以：<br>30000 ÷ 10000 = <strong>3 平方公尺</strong>'},
+];
+
+const FQs = [
+  {cat:'weight', text:'½ 公斤 = ? 公克',  ans:500,  hint:'先把分數換成小數：½ = 0.5<br>公斤換公克要乘 1000，所以：<br>0.5 × 1000 = <strong>500 公克</strong>'},
+  {cat:'volume', text:'¼ 公升 = ? 毫升',  ans:250,  hint:'先把分數換成小數：¼ = 0.25<br>公升換毫升要乘 1000，所以：<br>0.25 × 1000 = <strong>250 毫升</strong>'},
+  {cat:'length', text:'¾ 公尺 = ? 公分',  ans:75,   hint:'先把分數換成小數：¾ = 0.75<br>公尺換公分要乘 100，所以：<br>0.75 × 100 = <strong>75 公分</strong>'},
+  {cat:'length', text:'½ 公里 = ? 公尺',  ans:500,  hint:'先把分數換成小數：½ = 0.5<br>公里換公尺要乘 1000，所以：<br>0.5 × 1000 = <strong>500 公尺</strong>'},
+  {cat:'weight', text:'¼ 公斤 = ? 公克',  ans:250,  hint:'先把分數換成小數：¼ = 0.25<br>公斤換公克要乘 1000，所以：<br>0.25 × 1000 = <strong>250 公克</strong>'},
+  {cat:'volume', text:'¾ 公升 = ? 毫升',  ans:750,  hint:'先把分數換成小數：¾ = 0.75<br>公升換毫升要乘 1000，所以：<br>0.75 × 1000 = <strong>750 毫升</strong>'},
+  {cat:'length', text:'½ 公尺 = ? 公分',  ans:50,   hint:'先把分數換成小數：½ = 0.5<br>公尺換公分要乘 100，所以：<br>0.5 × 100 = <strong>50 公分</strong>'},
+  {cat:'weight', text:'⅕ 公斤 = ? 公克',  ans:200,  hint:'先把分數換成小數：⅕ = 0.2<br>公斤換公克要乘 1000，所以：<br>0.2 × 1000 = <strong>200 公克</strong>'},
+  {cat:'volume', text:'⅖ 公升 = ? 毫升',  ans:400,  hint:'先把分數換成小數：⅖ = 0.4<br>公升換毫升要乘 1000，所以：<br>0.4 × 1000 = <strong>400 毫升</strong>'},
+  {cat:'length', text:'¼ 公里 = ? 公尺',  ans:250,  hint:'先把分數換成小數：¼ = 0.25<br>公里換公尺要乘 1000，所以：<br>0.25 × 1000 = <strong>250 公尺</strong>'},
+];
+
+const catLabel = {length:'長度', weight:'重量', volume:'容量', area:'面積'};
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function pool() { return S.cat === 'all' ? Qs : Qs.filter(q => q.cat === S.cat); }
+
+function loadQ() {
+  const p = pool();
+  S.curQ = p[Math.floor(Math.random() * p.length)];
+  S.answered = false;
+  document.getElementById('qTag').textContent = catLabel[S.curQ.cat];
+  document.getElementById('qTag').className = 'q-tag ' + S.curQ.cat;
+  document.getElementById('qText').textContent = S.curQ.text;
+  document.getElementById('qHint').style.display = 'none';
+  const inp = document.getElementById('ansInput');
+  inp.value = ''; inp.className = 'ans-input'; inp.disabled = false; inp.focus();
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('btnNext').classList.remove('show');
+  updateProg();
+}
+
+function updateProg() {
+  document.getElementById('progFill').style.width = (S.qCount / S.qTotal * 100) + '%';
+  document.getElementById('qNum').textContent = S.qCount + 1;
+  document.getElementById('qAnswered').textContent = S.qCount;
+}
+
+const praiseMsg = [
+  '太棒了！你算得很準確 😊',
+  '答對了！看來你已經掌握這個概念了 👍',
+  '完全正確！這樣繼續下去一定沒問題 ⭐',
+  '對了！換算方向沒有搞錯，做得很好！',
+  '厲害！這題你想清楚了 🎉',
+];
+const streakMsg = [
+  '連續答對！你現在的狀態很好，繼續！🔥',
+  '連續對了好幾題！你正在進步中 🚀',
+  '停不下來了！這調子繼續保持 💪',
+];
+const wrongMsg = [
+  '沒關係，這題有點難，看看下面的提示再想想 😌',
+  '不要氣餒！每次弄懂一題都是進步 💪',
+  '答錯了也沒關係，重要的是看懂為什麼 🙂',
+  '這個觀念很多人都會混，搞懂了就不會忘了！',
+  '錯了才有機會學到新東西，沒事的 👌',
+];
+
+function randFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function checkAns() {
+  if (S.answered) return;
+  const inp = document.getElementById('ansInput');
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) return;
+  S.answered = true; S.qCount++; inp.disabled = true;
+  const ok = Math.abs(val - S.curQ.ans) < 0.0001;
+  const fb = document.getElementById('feedback');
+  if (ok) {
+    inp.className = 'ans-input correct';
+    S.correct++; S.streak++;
+    fb.className = 'feedback correct';
+    const praise = S.streak >= 3 ? randFrom(streakMsg) : randFrom(praiseMsg);
+    fb.innerHTML = `${praise}`;
+  } else {
+    inp.className = 'ans-input wrong'; S.streak = 0;
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `<div style="margin-bottom:8px">${randFrom(wrongMsg)}</div><div class="hint-block">正確答案是 <strong>${S.curQ.ans}</strong><br><br>${S.curQ.hint}</div>`;
+  }
+  document.getElementById('correctCount').textContent = S.correct;
+  document.getElementById('streakCount').textContent = S.streak;
+  if (S.qCount >= S.qTotal) setTimeout(showResult, 1200);
+  else document.getElementById('btnNext').classList.add('show');
+}
+
+function nextQ() { loadQ(); }
+
+function selectCat(cat, btn) {
+  S.cat = cat; S.qCount = 0;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); loadQ();
+}
+
+function showResult() {
+  const pct = Math.round(S.correct / S.qTotal * 100);
+  document.getElementById('rScore').textContent = S.correct + ' / ' + S.qTotal;
+  let icon, title, msg;
+  if (pct >= 90)      { icon='🏆'; title='你太厲害了！';     msg='幾乎全對！這個單元你已經掌握得很好了，繼續保持這個狀態！'; }
+  else if (pct >= 70) { icon='😊'; title='答得很不錯！';     msg='大部分都答對了，再多練幾次就能全對！你正在進步中。'; }
+  else if (pct >= 50) { icon='💪'; title='繼續加油，沒問題！'; msg='有一半答對了，這很好！建議先回去看看換算梯，把方向搞清楚再來練。'; }
+  else                { icon='📖'; title='多看幾遍就會了！';  msg='不要氣餒，單位換算一開始都覺得難。先看「換算梯」和「小數移位」，弄懂再來練！'; }
+  document.getElementById('rIcon').textContent = icon;
+  document.getElementById('rTitle').textContent = title;
+  document.getElementById('rMsg').textContent = msg;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function restartQuiz() {
+  S.correct = 0; S.streak = 0; S.qCount = 0;
+  document.getElementById('correctCount').textContent = 0;
+  document.getElementById('streakCount').textContent = 0;
+  document.getElementById('overlay').classList.remove('show');
+  loadQ();
+}
+
+let fi = 0;
+const fShuf = [...FQs].sort(() => Math.random() - 0.5);
+
+function loadFrac() {
+  const q = fShuf[fi % fShuf.length];
+  S.fracQ = q; S.fracDone = false;
+  document.getElementById('fracMeta').textContent = catLabel[q.cat];
+  document.getElementById('fracText').textContent = q.text;
+  const inp = document.getElementById('fracAnsInput');
+  inp.value = ''; inp.style.borderColor = ''; inp.disabled = false;
+  document.getElementById('fracFb').className = 'feedback';
+  document.getElementById('fracNext').classList.remove('show');
+}
+
+function checkFrac() {
+  if (S.fracDone) return;
+  const inp = document.getElementById('fracAnsInput');
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) return;
+  S.fracDone = true; inp.disabled = true;
+  const ok = Math.abs(val - S.fracQ.ans) < 0.01;
+  const fb = document.getElementById('fracFb');
+  if (ok) {
+    fb.className = 'feedback correct';
+    S.correct++; S.streak++;
+    fb.innerHTML = randFrom(praiseMsg);
+    document.getElementById('correctCount').textContent = S.correct;
+    document.getElementById('streakCount').textContent = S.streak;
+  } else {
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `<div style="margin-bottom:8px">${randFrom(wrongMsg)}</div><div class="hint-block">正確答案是 <strong>${S.fracQ.ans}</strong><br><br>${S.fracQ.hint}</div>`;
+    S.streak = 0; document.getElementById('streakCount').textContent = 0;
+  }
+  document.getElementById('fracNext').classList.add('show');
+}
+
+function nextFrac() { fi++; loadFrac(); }
+
+function calcShift() {
+  const n = parseFloat(document.getElementById('shiftNum').value) || 0;
+  const op = document.getElementById('shiftOp').value;
+  const map = {m1000:[n*1000,'× 1000'],m100:[n*100,'× 100'],m10:[n*10,'× 10'],d10:[n/10,'÷ 10'],d100:[n/100,'÷ 100'],d1000:[n/1000,'÷ 1000']};
+  const [res, label] = map[op];
+  document.getElementById('shiftResult').innerHTML =
+    `${n} ${label} = <span class="hi">${+res.toFixed(8)}</span>`;
+}
+
+loadQ(); loadFrac(); calcShift();
+</script>
+</body>
+</html>
