@@ -1722,6 +1722,7 @@ function showResult() {
   document.getElementById('rTitle').textContent = title;
   document.getElementById('rMsg').textContent   = msg;
   document.getElementById('overlay').classList.add('show');
+  sendLineNotify(pct);
 }
 
 function checkMilestone() {
@@ -1744,6 +1745,45 @@ function calcShift() {
   const map = {m1000:[n*1000,'× 1000'],m100:[n*100,'× 100'],m10:[n*10,'× 10'],d10:[n/10,'÷ 10'],d100:[n/100,'÷ 100'],d1000:[n/1000,'÷ 1000']};
   const [res, label] = map[op];
   document.getElementById('shiftResult').innerHTML = `${n} ${label} = <span class="hi">${+res.toFixed(8)}</span>`;
+}
+
+// ── 學生名字（localStorage 記 7 天）──
+function getStudentName() {
+  try {
+    const data = localStorage.getItem('studentInfo');
+    if (data) {
+      const obj = JSON.parse(data);
+      if ((Date.now() - obj.time) / 864e5 < 7) return obj.name;
+    }
+  } catch(e) {}
+  let name = '';
+  while (!name || name.trim() === '') {
+    name = prompt('請輸入小孩的名字 👦') || '';
+  }
+  name = name.trim();
+  localStorage.setItem('studentInfo', JSON.stringify({ name, time: Date.now() }));
+  return name;
+}
+
+const studentName = getStudentName();
+
+// 更新 header 標題
+document.querySelector('.header-title').textContent = `${studentName} 的數學修練之旅`;
+
+// ── LINE 通知 ──
+function sendLineNotify(pct) {
+  const time = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+  const message =
+    `\n📊 數學練習完成\n` +
+    `👦 學生：${studentName}\n` +
+    `🎯 正確率：${pct}%\n` +
+    `✅ 答對：${S.correct} / ${TOTAL_Q}\n` +
+    `🕒 時間：${time}`;
+  fetch('https://line-proxy.wugafly.workers.dev', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+  }).catch(() => {});
 }
 
 loadRecord(); loadPair(); loadFrac(); calcShift();
