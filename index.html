@@ -101,6 +101,9 @@
   .global-prog-row { display:flex; justify-content:space-between; font-size:13px; color:var(--text-mid); margin-bottom:6px; }
   .global-prog-row strong { color:var(--accent); }
   .q-top-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .q-level-badge { font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; display:none; }
+  .q-level-badge.basic    { display:inline-block; background:#f0f0ee; color:var(--text-light); }
+  .q-level-badge.advanced { display:inline-block; background:#fff3e0; color:#b06000; border:1px solid #f0c060; }
   .q-tag { display:inline-block; font-size:12px; font-weight:700; padding:4px 8px; border-radius:4px; }
   .q-type-badge { display:inline-block; font-size:11px; font-weight:700; padding:4px 8px; border-radius:4px; background:#f0f0ee; color:var(--text-light); }
   .q-type-badge.life { background:#fff8e8; color:#8a6020; border:1px solid #f0d898; }
@@ -155,15 +158,22 @@
   .frac-q-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:12px; }
   .frac-q-meta { font-size:12px; color:var(--text-light); margin-bottom:8px; }
   .frac-q-text { font-size:20px; font-weight:700; }
+  .frac-ans-hint {
+    margin-top:10px; padding:8px 12px;
+    background: white; border:1px solid var(--border); border-radius:6px;
+    font-size:13px; font-weight:600; color:var(--text-mid);
+    text-align:center; display:none;
+  }
+  .frac-ans-hint.show { display:block; }
 
   /* ── Overlays ── */
   .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:100; align-items:center; justify-content:center; padding:20px; }
   .overlay.show { display:flex; }
   .result-card { background:white; border-radius:12px; padding:32px 24px; max-width:320px; width:100%; text-align:center; }
   .result-icon  { font-size:48px; margin-bottom:12px; }
-  .result-title { font-size:20px; font-weight:700; margin-bottom:4px; }
-  .result-score { font-size:36px; font-weight:700; color:var(--accent); margin:8px 0; }
-  .result-pct   { font-size:16px; color:var(--text-mid); margin-bottom:4px; }
+  .result-title { font-size:20px; font-weight:700; margin-bottom:12px; }
+  .result-pct   { font-size:48px; font-weight:700; color:var(--accent); margin-bottom:4px; }
+  .result-score { font-size:15px; color:var(--text-light); margin-bottom:12px; }
   .result-msg   { font-size:14px; color:var(--text-mid); margin-bottom:20px; line-height:1.7; }
 
   /* milestone overlay */
@@ -185,7 +195,7 @@
     .l-unit .u-name { font-size:13px; }
     .l-gap { min-width:48px; font-size:10px; }
     .q-card { padding:20px 16px; }
-    .q-text { font-size:20px; }
+    .q-text { font-size:24px; }
     .ans-row { flex-direction:column; gap:8px; }
     .ans-input { font-size:20px; padding:16px; width:100%; }
     .btn-primary { width:100%; padding:14px; font-size:15px; text-align:center; }
@@ -205,14 +215,14 @@
     .tab-btn { font-size:14px; padding:12px 12px; }
     .l-unit { padding:12px 20px; min-width:80px; }
     .l-gap { min-width:72px; font-size:12px; }
-    .q-text { font-size:26px; }
+    .q-text { font-size:24px; }
     .formula-grid { grid-template-columns:repeat(3,1fr); }
   }
   @media (min-width:821px) {
     .tab-btn { font-size:14px; padding:14px 16px; }
     .card { padding:24px; margin-bottom:20px; }
     .q-card { padding:32px 24px; }
-    .q-text { font-size:28px; }
+    .q-text { font-size:24px; }
     .ans-input { font-size:24px; padding:16px; }
     .btn-primary { padding:16px 28px; font-size:16px; }
     .btn-next { padding:16px; font-size:16px; }
@@ -251,7 +261,7 @@
     <button class="tab-btn" onclick="switchTab('ladder',this)">換算梯</button>
     <button class="tab-btn" onclick="switchTab('formula',this)">公式記憶</button>
     <button class="tab-btn" onclick="switchTab('decimal',this)">小數移位</button>
-    <button class="tab-btn" onclick="switchTab('fraction',this)">分數橋接</button>
+    <button class="tab-btn" onclick="switchTab('fraction',this)">分數↔小數</button>
   </div>
 </div>
 
@@ -472,6 +482,8 @@
       <button class="cat-btn" onclick="selectCat('time',this)">時間</button>
       <button class="cat-btn" onclick="selectCat('area',this)">面積</button>
       <button class="cat-btn" onclick="selectCat('vol3d',this)">體積</button>
+      <button class="cat-btn" onclick="selectCat('perim',this)">周長</button>
+      <button class="cat-btn" onclick="selectCat('fracapp',this)">分數應用</button>
     </div>
 
     <!-- 第1題：換算題 -->
@@ -480,6 +492,7 @@
       <div class="q-top-row">
         <div class="q-tag" id="qTagA">重量</div>
         <div class="q-type-badge">🔢 換算題</div>
+        <div class="q-level-badge" id="qLevelA"></div>
       </div>
       <div class="q-text" id="qTextA">載入中...</div>
     </div>
@@ -496,8 +509,9 @@
       <div class="q-top-row">
         <div class="q-tag" id="qTagB">重量</div>
         <div class="q-type-badge life">🏠 生活應用</div>
+        <div class="q-level-badge" id="qLevelB"></div>
       </div>
-      <div class="q-text" id="qTextB" style="font-size:18px">載入中...</div>
+      <div class="q-text" id="qTextB">載入中...</div>
     </div>
     <div class="ans-row">
       <input type="number" class="ans-input" id="ansB" placeholder="填入答案" step="any"
@@ -549,25 +563,48 @@
     </div>
   </div>
 
-  <!-- ══ 分數橋接 ══ -->
+  <!-- ══ 分數↔小數 ══ -->
   <div id="tab-fraction" class="section">
+
+    <!-- 參考表 -->
     <div class="card">
-      <div class="card-title">常用分數 = 小數</div>
+      <div class="card-title">常用對照表</div>
       <div class="frac-grid">
-        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">2</div><div class="frac-eq">等於</div><div class="frac-dec">0.5</div></div>
-        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">4</div><div class="frac-eq">等於</div><div class="frac-dec">0.25</div></div>
-        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">4</div><div class="frac-eq">等於</div><div class="frac-dec">0.75</div></div>
-        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">5</div><div class="frac-eq">等於</div><div class="frac-dec">0.2</div></div>
-        <div class="frac-card"><div><span class="frac-n">2</span></div><div class="frac-d">5</div><div class="frac-eq">等於</div><div class="frac-dec">0.4</div></div>
-        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">5</div><div class="frac-eq">等於</div><div class="frac-dec">0.6</div></div>
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">2</div><div class="frac-eq">=</div><div class="frac-dec">0.5</div></div>
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">4</div><div class="frac-eq">=</div><div class="frac-dec">0.25</div></div>
+        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">4</div><div class="frac-eq">=</div><div class="frac-dec">0.75</div></div>
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">5</div><div class="frac-eq">=</div><div class="frac-dec">0.2</div></div>
+        <div class="frac-card"><div><span class="frac-n">2</span></div><div class="frac-d">5</div><div class="frac-eq">=</div><div class="frac-dec">0.4</div></div>
+        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">5</div><div class="frac-eq">=</div><div class="frac-dec">0.6</div></div>
+        <div class="frac-card"><div><span class="frac-n">4</span></div><div class="frac-d">5</div><div class="frac-eq">=</div><div class="frac-dec">0.8</div></div>
+        <div class="frac-card"><div><span class="frac-n">1</span></div><div class="frac-d">10</div><div class="frac-eq">=</div><div class="frac-dec">0.1</div></div>
+        <div class="frac-card"><div><span class="frac-n">3</span></div><div class="frac-d">10</div><div class="frac-eq">=</div><div class="frac-dec">0.3</div></div>
+      </div>
+      <div class="info-box" style="margin-top:12px; font-size:12px; line-height:1.9;">
+        <strong>帶分數</strong>：整數部分 + 分數部分。例如 1½ = 1 + 0.5 = <strong>1.5</strong><br>
+        <strong>假分數</strong>：分子 ≥ 分母。例如 ⁵⁄₄ = 5 ÷ 4 = <strong>1.25</strong>
       </div>
     </div>
+
+    <!-- 練習區 -->
     <div class="card">
-      <div class="card-title">分數換算練習</div>
-      <div class="frac-q-box">
-        <div class="frac-q-meta" id="fracMeta">重量</div>
-        <div class="frac-q-text" id="fracText">載入中...</div>
+      <div class="card-title">分數↔小數 練習</div>
+
+      <!-- 題型切換 -->
+      <div class="cat-row" style="margin-bottom:14px">
+        <button class="cat-btn active" onclick="selectFracType('all',this)">全部</button>
+        <button class="cat-btn" onclick="selectFracType('frac2dec',this)">分數→小數</button>
+        <button class="cat-btn" onclick="selectFracType('dec2frac',this)">小數→分數</button>
+        <button class="cat-btn" onclick="selectFracType('mixed',this)">帶分數</button>
+        <button class="cat-btn" onclick="selectFracType('improper',this)">假分數</button>
       </div>
+
+      <div class="frac-q-box">
+        <div class="frac-q-text" id="fracText" style="font-size:26px; font-weight:700; text-align:center; padding:8px 0;">載入中...</div>
+        <!-- 作答提示 -->
+        <div class="frac-ans-hint" id="fracAnsHint"></div>
+      </div>
+
       <div class="ans-row">
         <input type="number" step="any" id="fracAnsInput" class="ans-input" placeholder="填入答案"
           onkeydown="if(event.key==='Enter') checkFrac()">
@@ -576,30 +613,20 @@
       <div id="fracFb" class="feedback"></div>
       <button id="fracNext" class="btn-next" onclick="nextFrac()">下一題 →</button>
     </div>
+
   </div>
 
 </div><!-- /main -->
 
-<!-- 每回合結果 overlay -->
+<!-- 結果 overlay -->
 <div class="overlay" id="overlay">
   <div class="result-card">
     <div class="result-icon" id="rIcon">🌟</div>
     <div class="result-title" id="rTitle">練習完成！</div>
-    <div class="result-score" id="rScore">40 / 50</div>
-    <div class="result-pct" id="rPct">正確率 80%</div>
+    <div class="result-pct" id="rPct">35%</div>
+    <div class="result-score" id="rScore">7 / 20</div>
     <div class="result-msg" id="rMsg"></div>
     <button class="btn-primary" style="width:100%" onclick="restartQuiz()">再練一次 🔄</button>
-  </div>
-</div>
-
-<!-- 20題里程碑 overlay -->
-<div class="overlay" id="milestoneOverlay">
-  <div class="milestone-card">
-    <div class="m-icon">🌟</div>
-    <div class="m-title">今天超級棒！</div>
-    <div class="m-pct" id="mPct">85%</div>
-    <div class="m-msg" id="mMsg">今天的正確率是 85%！你已經答對了 20 題，非常努力！繼續加油，你越來越厲害了 💪</div>
-    <button class="btn-primary" style="width:100%;margin-bottom:0" onclick="closeMilestone()">繼續練習！</button>
   </div>
 </div>
 
@@ -613,99 +640,849 @@ const S = {
   milestoneShown:false, roundDone:false
 };
 
-// ── Question bank ──
-// type: 'unit' = 純換算，'life' = 生活應用
-const Qs = [
-  // 長度 — 換算
-  {cat:'length', type:'unit', text:'3 公里 = ? 公尺',    ans:3000,  hint:'公里換公尺，是大單位換小單位，所以數字要變大，用乘法。<br>1 公里 = 1000 公尺，所以：<br>3 × 1000 = <strong>3000 公尺</strong>'},
-  {cat:'length', type:'unit', text:'250 公分 = ? 公尺',  ans:2.5,   hint:'公分換公尺，是小單位換大單位，所以數字要變小，用除法。<br>100 公分 = 1 公尺，所以：<br>250 ÷ 100 = <strong>2.5 公尺</strong>'},
-  {cat:'length', type:'unit', text:'1.5 公尺 = ? 公分',  ans:150,   hint:'公尺換公分，是大單位換小單位，數字要變大，用乘法。<br>1 公尺 = 100 公分，所以：<br>1.5 × 100 = <strong>150 公分</strong>'},
-  {cat:'length', type:'unit', text:'5000 公尺 = ? 公里', ans:5,     hint:'公尺換公里，是小單位換大單位，數字要變小，用除法。<br>1000 公尺 = 1 公里，所以：<br>5000 ÷ 1000 = <strong>5 公里</strong>'},
-  {cat:'length', type:'unit', text:'8 公分 = ? 公厘',    ans:80,    hint:'公分換公厘，是大單位換小單位，數字要變大，用乘法。<br>1 公分 = 10 公厘，所以：<br>8 × 10 = <strong>80 公厘</strong>'},
-  {cat:'length', type:'unit', text:'45 公厘 = ? 公分',   ans:4.5,   hint:'公厘換公分，是小單位換大單位，數字要變小，用除法。<br>10 公厘 = 1 公分，所以：<br>45 ÷ 10 = <strong>4.5 公分</strong>'},
-  {cat:'length', type:'unit', text:'2.5 公里 = ? 公尺',  ans:2500,  hint:'公里換公尺，大換小，用乘法。<br>1 公里 = 1000 公尺，所以：<br>2.5 × 1000 = <strong>2500 公尺</strong>'},
-  {cat:'length', type:'unit', text:'0.5 公尺 = ? 公分',  ans:50,    hint:'公尺換公分，大換小，用乘法。<br>1 公尺 = 100 公分，所以：<br>0.5 × 100 = <strong>50 公分</strong>'},
-  {cat:'length', type:'unit', text:'1200 公分 = ? 公尺', ans:12,    hint:'公分換公尺，小換大，用除法。<br>100 公分 = 1 公尺，所以：<br>1200 ÷ 100 = <strong>12 公尺</strong>'},
-  // 長度 — 生活應用
-  {cat:'length', type:'life', text:'小明家到學校有 2.5 公里，請問是幾公尺？', ans:2500, hint:'公里換公尺，大換小，用乘法。<br>1 公里 = 1000 公尺，所以：<br>2.5 × 1000 = <strong>2500 公尺</strong>'},
-  {cat:'length', type:'life', text:'一條絲帶長 350 公分，請問是幾公尺？', ans:3.5, hint:'公分換公尺，小換大，用除法。<br>100 公分 = 1 公尺，所以：<br>350 ÷ 100 = <strong>3.5 公尺</strong>'},
-  {cat:'length', type:'life', text:'教室的黑板寬 4 公尺，請問是幾公分？', ans:400, hint:'公尺換公分，大換小，用乘法。<br>1 公尺 = 100 公分，所以：<br>4 × 100 = <strong>400 公分</strong>'},
-  {cat:'length', type:'life', text:'一支鉛筆長 18 公分，請問是幾公厘？', ans:180, hint:'公分換公厘，大換小，用乘法。<br>1 公分 = 10 公厘，所以：<br>18 × 10 = <strong>180 公厘</strong>'},
-  // 重量 — 換算
-  {cat:'weight', type:'unit', text:'3 公斤 = ? 公克',    ans:3000,  hint:'公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>3 × 1000 = <strong>3000 公克</strong>'},
-  {cat:'weight', type:'unit', text:'2500 公克 = ? 公斤', ans:2.5,   hint:'公克換公斤，小換大，用除法。<br>1000 公克 = 1 公斤，所以：<br>2500 ÷ 1000 = <strong>2.5 公斤</strong>'},
-  {cat:'weight', type:'unit', text:'0.5 公斤 = ? 公克',  ans:500,   hint:'公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>0.5 × 1000 = <strong>500 公克</strong>'},
-  {cat:'weight', type:'unit', text:'4.2 公斤 = ? 公克',  ans:4200,  hint:'公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>4.2 × 1000 = <strong>4200 公克</strong>'},
-  {cat:'weight', type:'unit', text:'750 公克 = ? 公斤',  ans:0.75,  hint:'公克換公斤，小換大，用除法。<br>1000 公克 = 1 公斤，所以：<br>750 ÷ 1000 = <strong>0.75 公斤</strong>'},
-  {cat:'weight', type:'unit', text:'1500 公克 = ? 公斤', ans:1.5,   hint:'公克換公斤，小換大，用除法。<br>1000 公克 = 1 公斤，所以：<br>1500 ÷ 1000 = <strong>1.5 公斤</strong>'},
-  {cat:'weight', type:'unit', text:'0.25 公斤 = ? 公克', ans:250,   hint:'公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>0.25 × 1000 = <strong>250 公克</strong>'},
-  // 重量 — 生活應用
-  {cat:'weight', type:'life', text:'媽媽買了一袋 3 公斤的米，請問是幾公克？', ans:3000, hint:'公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>3 × 1000 = <strong>3000 公克</strong>'},
-  {cat:'weight', type:'life', text:'一顆蘋果重 250 公克，請問是幾公斤？', ans:0.25, hint:'公克換公斤，小換大，用除法。<br>1000 公克 = 1 公斤，所以：<br>250 ÷ 1000 = <strong>0.25 公斤</strong>'},
-  {cat:'weight', type:'life', text:'弟弟的書包重 1500 公克，請問是幾公斤？', ans:1.5, hint:'公克換公斤，小換大，用除法。<br>1000 公克 = 1 公斤，所以：<br>1500 ÷ 1000 = <strong>1.5 公斤</strong>'},
-  {cat:'weight', type:'life', text:'爸爸買了 2.5 公斤的豬肉，請問是幾公克？', ans:2500, hint:'公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>2.5 × 1000 = <strong>2500 公克</strong>'},
-  // 容量 — 換算
-  {cat:'volume', type:'unit', text:'2 公升 = ? 毫升',    ans:2000,  hint:'公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>2 × 1000 = <strong>2000 毫升</strong>'},
-  {cat:'volume', type:'unit', text:'500 毫升 = ? 公升',  ans:0.5,   hint:'毫升換公升，小換大，用除法。<br>1000 毫升 = 1 公升，所以：<br>500 ÷ 1000 = <strong>0.5 公升</strong>'},
-  {cat:'volume', type:'unit', text:'1.5 公升 = ? 毫升',  ans:1500,  hint:'公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>1.5 × 1000 = <strong>1500 毫升</strong>'},
-  {cat:'volume', type:'unit', text:'250 毫升 = ? 公升',  ans:0.25,  hint:'毫升換公升，小換大，用除法。<br>1000 毫升 = 1 公升，所以：<br>250 ÷ 1000 = <strong>0.25 公升</strong>'},
-  {cat:'volume', type:'unit', text:'0.75 公升 = ? 毫升', ans:750,   hint:'公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>0.75 × 1000 = <strong>750 毫升</strong>'},
-  {cat:'volume', type:'unit', text:'3 公升 = ? 毫升',    ans:3000,  hint:'公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>3 × 1000 = <strong>3000 毫升</strong>'},
-  // 容量 — 生活應用
-  {cat:'volume', type:'life', text:'一瓶果汁有 1500 毫升，請問是幾公升？', ans:1.5, hint:'毫升換公升，小換大，用除法。<br>1000 毫升 = 1 公升，所以：<br>1500 ÷ 1000 = <strong>1.5 公升</strong>'},
-  {cat:'volume', type:'life', text:'媽媽煮湯用了 0.5 公升的水，請問是幾毫升？', ans:500, hint:'公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>0.5 × 1000 = <strong>500 毫升</strong>'},
-  {cat:'volume', type:'life', text:'一盒牛奶有 250 毫升，請問是幾公升？', ans:0.25, hint:'毫升換公升，小換大，用除法。<br>1000 毫升 = 1 公升，所以：<br>250 ÷ 1000 = <strong>0.25 公升</strong>'},
-  {cat:'volume', type:'life', text:'游泳池裡有 2000 公升的水，請問是幾毫升？', ans:2000000, hint:'公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>2000 × 1000 = <strong>2,000,000 毫升</strong>'},
-  // 時間 — 換算
-  {cat:'time', type:'unit', text:'2 小時 = ? 分鐘',   ans:120,  hint:'小時換分鐘，大換小，用乘法。<br>1 小時 = 60 分鐘，所以：<br>2 × 60 = <strong>120 分鐘</strong>'},
-  {cat:'time', type:'unit', text:'180 分鐘 = ? 小時', ans:3,    hint:'分鐘換小時，小換大，用除法。<br>60 分鐘 = 1 小時，所以：<br>180 ÷ 60 = <strong>3 小時</strong>'},
-  {cat:'time', type:'unit', text:'3 分鐘 = ? 秒',     ans:180,  hint:'分鐘換秒，大換小，用乘法。<br>1 分鐘 = 60 秒，所以：<br>3 × 60 = <strong>180 秒</strong>'},
-  {cat:'time', type:'unit', text:'240 秒 = ? 分鐘',   ans:4,    hint:'秒換分鐘，小換大，用除法。<br>60 秒 = 1 分鐘，所以：<br>240 ÷ 60 = <strong>4 分鐘</strong>'},
-  {cat:'time', type:'unit', text:'1.5 小時 = ? 分鐘', ans:90,   hint:'1.5 小時換分鐘，用乘法。<br>1 小時 = 60 分鐘，所以：<br>1.5 × 60 = <strong>90 分鐘</strong>'},
-  {cat:'time', type:'unit', text:'1 小時 = ? 秒',     ans:3600, hint:'先換：1 小時 = 60 分鐘，再換：60 分鐘 × 60 = <strong>3600 秒</strong>'},
-  // 時間 — 生活應用
-  {cat:'time', type:'life', text:'一部電影播放了 120 分鐘，請問是幾小時？', ans:2, hint:'分鐘換小時，小換大，用除法。<br>60 分鐘 = 1 小時，所以：<br>120 ÷ 60 = <strong>2 小時</strong>'},
-  {cat:'time', type:'life', text:'小華做功課做了 1.5 小時，請問是幾分鐘？', ans:90, hint:'小時換分鐘，大換小，用乘法。<br>1 小時 = 60 分鐘，所以：<br>1.5 × 60 = <strong>90 分鐘</strong>'},
-  {cat:'time', type:'life', text:'百米賽跑跑了 15 秒，請問是幾分鐘？', ans:0.25, hint:'秒換分鐘，小換大，用除法。<br>60 秒 = 1 分鐘，所以：<br>15 ÷ 60 = <strong>0.25 分鐘</strong>'},
-  {cat:'time', type:'life', text:'一場足球賽打了 90 分鐘，請問是幾小時？', ans:1.5, hint:'分鐘換小時，小換大，用除法。<br>60 分鐘 = 1 小時，所以：<br>90 ÷ 60 = <strong>1.5 小時</strong>'},
-  // 面積 — 換算
-  {cat:'area', type:'unit', text:'2 平方公尺 = ? 平方公分',     ans:20000, hint:'平方公尺換平方公分，數字要變大，用乘法。<br>1m² = 100 × 100 = 10000cm²，所以：<br>2 × 10000 = <strong>20000 平方公分</strong>'},
-  {cat:'area', type:'unit', text:'50000 平方公分 = ? 平方公尺', ans:5,     hint:'平方公分換平方公尺，數字要變小，用除法。<br>10000cm² = 1m²，所以：<br>50000 ÷ 10000 = <strong>5 平方公尺</strong>'},
-  {cat:'area', type:'unit', text:'0.5 平方公尺 = ? 平方公分',   ans:5000,  hint:'0.5m² 換 cm²，用乘法。<br>1m² = 10000cm²，所以：<br>0.5 × 10000 = <strong>5000 平方公分</strong>'},
-  {cat:'area', type:'unit', text:'30000 平方公分 = ? 平方公尺', ans:3,     hint:'平方公分換平方公尺，用除法。<br>10000cm² = 1m²，所以：<br>30000 ÷ 10000 = <strong>3 平方公尺</strong>'},
-  // 面積 — 生活應用
-  {cat:'area', type:'life', text:'一張課桌面長 60 公分、寬 40 公分，面積是幾平方公分？', ans:2400, hint:'面積 = 長 × 寬<br>60 × 40 = <strong>2400 平方公分</strong>'},
-  {cat:'area', type:'life', text:'教室地板面積是 60 平方公尺，請問是幾平方公分？', ans:600000, hint:'平方公尺換平方公分，用乘法。<br>1m² = 10000cm²，所以：<br>60 × 10000 = <strong>600,000 平方公分</strong>'},
-  {cat:'area', type:'life', text:'一本筆記本封面長 30 公分、寬 20 公分，面積是幾平方公分？', ans:600, hint:'面積 = 長 × 寬<br>30 × 20 = <strong>600 平方公分</strong>'},
-  // 體積 — 換算
-  {cat:'vol3d', type:'unit', text:'1 立方公尺 = ? 立方公分', ans:1000000, hint:'體積是長 × 寬 × 高，三邊都要換。<br>1m = 100cm，所以：<br>100 × 100 × 100 = <strong>1,000,000 立方公分</strong>'},
-  {cat:'vol3d', type:'unit', text:'2000 立方公分 = ? 公升',  ans:2,       hint:'特別記：1 公升 = 1000cm³。<br>所以：<br>2000 ÷ 1000 = <strong>2 公升</strong>'},
-  {cat:'vol3d', type:'unit', text:'3 公升 = ? 立方公分',     ans:3000,    hint:'1 公升 = 1000cm³，所以：<br>3 × 1000 = <strong>3000 立方公分</strong>'},
-  {cat:'vol3d', type:'unit', text:'5000 立方公分 = ? 公升',  ans:5,       hint:'1000cm³ = 1 公升，所以：<br>5000 ÷ 1000 = <strong>5 公升</strong>'},
-  // 體積 — 生活應用
-  {cat:'vol3d', type:'life', text:'一個長方體水箱，長 10cm、寬 10cm、高 10cm，體積是幾立方公分？', ans:1000, hint:'體積 = 長 × 寬 × 高<br>10 × 10 × 10 = <strong>1000 立方公分</strong>'},
-  {cat:'vol3d', type:'life', text:'一個正方體積木邊長 5 公分，體積是幾立方公分？', ans:125, hint:'正方體體積 = 邊長 × 邊長 × 邊長<br>5 × 5 × 5 = <strong>125 立方公分</strong>'},
-  {cat:'vol3d', type:'life', text:'一個水桶裝了 5000 立方公分的水，請問是幾公升？', ans:5, hint:'1000cm³ = 1 公升，所以：<br>5000 ÷ 1000 = <strong>5 公升</strong>'},
+// ── 動態題目產生器 ──
+// 每次呼叫都產生隨機數字，題目永遠不重複
+
+function rInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function rFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function nice(n) { return parseFloat(n.toFixed(4)); }
+
+// 題目模板：每個函式回傳一個 {cat, type, text, ans, hint} 物件
+const QGen = {
+
+  // ── 長度 unit ──
+  km_to_m()  { const n = rFrom([1,2,3,4,5,6,8,10,1.5,2.5,3.5,0.5,4.5]); return { cat:'length', type:'unit', text:`${n} 公里 = ? 公尺`, ans:nice(n*1000), hint:`公里換公尺，大換小，用乘法。<br>1 公里 = 1000 公尺，所以：<br>${n} × 1000 = <strong>${nice(n*1000)} 公尺</strong>` }; },
+  m_to_km()  { const n = rFrom([1000,2000,3000,4000,5000,500,1500,2500,3500]); return { cat:'length', type:'unit', text:`${n} 公尺 = ? 公里`, ans:nice(n/1000), hint:`公尺換公里，小換大，用除法。<br>1000 公尺 = 1 公里，所以：<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公里</strong>` }; },
+  m_to_cm()  { const n = rFrom([1,2,3,4,5,1.5,2.5,0.5,3.5,0.8,1.2]); return { cat:'length', type:'unit', text:`${n} 公尺 = ? 公分`, ans:nice(n*100), hint:`公尺換公分，大換小，用乘法。<br>1 公尺 = 100 公分，所以：<br>${n} × 100 = <strong>${nice(n*100)} 公分</strong>` }; },
+  cm_to_m()  { const n = rFrom([100,150,200,250,300,350,400,450,500,80,120,180,320]); return { cat:'length', type:'unit', text:`${n} 公分 = ? 公尺`, ans:nice(n/100), hint:`公分換公尺，小換大，用除法。<br>100 公分 = 1 公尺，所以：<br>${n} ÷ 100 = <strong>${nice(n/100)} 公尺</strong>` }; },
+  cm_to_mm() { const n = rFrom([1,2,3,5,8,10,12,15,18,20,25,30]); return { cat:'length', type:'unit', text:`${n} 公分 = ? 公厘`, ans:nice(n*10), hint:`公分換公厘，大換小，用乘法。<br>1 公分 = 10 公厘，所以：<br>${n} × 10 = <strong>${nice(n*10)} 公厘</strong>` }; },
+  mm_to_cm() { const n = rFrom([10,20,30,40,50,60,70,80,90,15,25,35,45]); return { cat:'length', type:'unit', text:`${n} 公厘 = ? 公分`, ans:nice(n/10), hint:`公厘換公分，小換大，用除法。<br>10 公厘 = 1 公分，所以：<br>${n} ÷ 10 = <strong>${nice(n/10)} 公分</strong>` }; },
+
+  // ── 長度 life ──
+  life_length() {
+    const scenes = [
+      () => { const n=rFrom([1,1.5,2,2.5,3]); return { text:`小明家到學校有 ${n} 公里，請問是幾公尺？`, ans:nice(n*1000), hint:`公里換公尺，大換小，用乘法。<br>1 公里 = 1000 公尺，所以：<br>${n} × 1000 = <strong>${nice(n*1000)} 公尺</strong>` }; },
+      () => { const n=rFrom([150,200,250,300,350,400,450]); return { text:`一條絲帶長 ${n} 公分，請問是幾公尺？`, ans:nice(n/100), hint:`公分換公尺，小換大，用除法。<br>100 公分 = 1 公尺，所以：<br>${n} ÷ 100 = <strong>${nice(n/100)} 公尺</strong>` }; },
+      () => { const n=rFrom([3,4,5,6,8,10,12,15,18,20]); return { text:`一支鉛筆長 ${n} 公分，請問是幾公厘？`, ans:nice(n*10), hint:`公分換公厘，大換小，用乘法。<br>1 公分 = 10 公厘，所以：<br>${n} × 10 = <strong>${nice(n*10)} 公厘</strong>` }; },
+      () => { const n=rFrom([1,2,3,4,5,1.5,2.5]); return { text:`游泳池長 ${n} 公尺，請問是幾公分？`, ans:nice(n*100), hint:`公尺換公分，大換小，用乘法。<br>1 公尺 = 100 公分，所以：<br>${n} × 100 = <strong>${nice(n*100)} 公分</strong>` }; },
+      () => { const n=rFrom([500,1000,1500,2000,2500,3000]); return { text:`操場跑道一圈 ${n} 公尺，請問是幾公里？`, ans:nice(n/1000), hint:`公尺換公里，小換大，用除法。<br>1000 公尺 = 1 公里，所以：<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公里</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'length', type:'life', text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 重量 unit ──
+  kg_to_g()  { const n = rFrom([1,2,3,4,5,0.5,1.5,2.5,3.5,0.25,0.75,4.5,0.8,1.2,2.8]); return { cat:'weight', type:'unit', text:`${n} 公斤 = ? 公克`, ans:nice(n*1000), hint:`公斤換公克，大換小，用乘法。<br>1 公斤 = 1000 公克，所以：<br>${n} × 1000 = <strong>${nice(n*1000)} 公克</strong>` }; },
+  g_to_kg()  { const n = rFrom([500,750,1000,1500,2000,2500,3000,250,300,400,800,1200,1800]); return { cat:'weight', type:'unit', text:`${n} 公克 = ? 公斤`, ans:nice(n/1000), hint:`公克換公斤，小換大，用除法。<br>1000 公克 = 1 公斤，所以：<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公斤</strong>` }; },
+
+  // ── 重量 life ──
+  life_weight() {
+    const scenes = [
+      () => { const n=rFrom([1,2,3,5,10]); return { text:`媽媽買了 ${n} 公斤的米，請問是幾公克？`, ans:nice(n*1000), hint:`公斤換公克，大換小，用乘法。<br>${n} × 1000 = <strong>${nice(n*1000)} 公克</strong>` }; },
+      () => { const n=rFrom([200,250,300,350,400,450,500]); return { text:`一顆蘋果重 ${n} 公克，請問是幾公斤？`, ans:nice(n/1000), hint:`公克換公斤，小換大，用除法。<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公斤</strong>` }; },
+      () => { const n=rFrom([800,1000,1200,1500,1800,2000]); return { text:`弟弟的書包重 ${n} 公克，請問是幾公斤？`, ans:nice(n/1000), hint:`公克換公斤，小換大，用除法。<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公斤</strong>` }; },
+      () => { const n=rFrom([0.5,1,1.5,2,2.5,3]); return { text:`爸爸買了 ${n} 公斤的排骨，請問是幾公克？`, ans:nice(n*1000), hint:`公斤換公克，大換小，用乘法。<br>${n} × 1000 = <strong>${nice(n*1000)} 公克</strong>` }; },
+      () => { const n=rFrom([100,150,200,250,300]); return { text:`一盒巧克力重 ${n} 公克，請問是幾公斤？`, ans:nice(n/1000), hint:`公克換公斤，小換大，用除法。<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公斤</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'weight', type:'life', text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 容量 unit ──
+  L_to_mL()  { const n = rFrom([1,2,3,0.5,1.5,2.5,0.25,0.75,3.5,4,0.8,1.2]); return { cat:'volume', type:'unit', text:`${n} 公升 = ? 毫升`, ans:nice(n*1000), hint:`公升換毫升，大換小，用乘法。<br>1 公升 = 1000 毫升，所以：<br>${n} × 1000 = <strong>${nice(n*1000)} 毫升</strong>` }; },
+  mL_to_L()  { const n = rFrom([250,500,750,1000,1500,2000,300,400,600,800,1200,1800]); return { cat:'volume', type:'unit', text:`${n} 毫升 = ? 公升`, ans:nice(n/1000), hint:`毫升換公升，小換大，用除法。<br>1000 毫升 = 1 公升，所以：<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公升</strong>` }; },
+
+  // ── 容量 life ──
+  life_volume() {
+    const scenes = [
+      () => { const n=rFrom([500,750,1000,1500,2000]); return { text:`一瓶果汁有 ${n} 毫升，請問是幾公升？`, ans:nice(n/1000), hint:`毫升換公升，小換大，用除法。<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公升</strong>` }; },
+      () => { const n=rFrom([0.5,1,1.5,2,2.5]); return { text:`媽媽煮湯用了 ${n} 公升的水，請問是幾毫升？`, ans:nice(n*1000), hint:`公升換毫升，大換小，用乘法。<br>${n} × 1000 = <strong>${nice(n*1000)} 毫升</strong>` }; },
+      () => { const n=rFrom([200,250,300,330,500]); return { text:`一瓶飲料有 ${n} 毫升，請問是幾公升？`, ans:nice(n/1000), hint:`毫升換公升，小換大，用除法。<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公升</strong>` }; },
+      () => { const n=rFrom([1,2,3,4,5]); return { text:`魚缸裡有 ${n} 公升的水，請問是幾毫升？`, ans:nice(n*1000), hint:`公升換毫升，大換小，用乘法。<br>${n} × 1000 = <strong>${nice(n*1000)} 毫升</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'volume', type:'life', text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 時間 unit ──
+  h_to_min() { const n = rFrom([1,2,3,4,5,0.5,1.5,2.5,0.25,0.75,1.25]); return { cat:'time', type:'unit', text:`${n} 小時 = ? 分鐘`, ans:nice(n*60), hint:`小時換分鐘，大換小，用乘法。<br>1 小時 = 60 分鐘，所以：<br>${n} × 60 = <strong>${nice(n*60)} 分鐘</strong>` }; },
+  min_to_h() { const n = rFrom([30,60,90,120,150,180,240,15,45,75]); return { cat:'time', type:'unit', text:`${n} 分鐘 = ? 小時`, ans:nice(n/60), hint:`分鐘換小時，小換大，用除法。<br>60 分鐘 = 1 小時，所以：<br>${n} ÷ 60 = <strong>${nice(n/60)} 小時</strong>` }; },
+  min_to_s() { const n = rFrom([1,2,3,4,5,6,8,10]); return { cat:'time', type:'unit', text:`${n} 分鐘 = ? 秒`, ans:nice(n*60), hint:`分鐘換秒，大換小，用乘法。<br>1 分鐘 = 60 秒，所以：<br>${n} × 60 = <strong>${nice(n*60)} 秒</strong>` }; },
+  s_to_min() { const n = rFrom([60,120,180,240,300,360,30,90,150]); return { cat:'time', type:'unit', text:`${n} 秒 = ? 分鐘`, ans:nice(n/60), hint:`秒換分鐘，小換大，用除法。<br>60 秒 = 1 分鐘，所以：<br>${n} ÷ 60 = <strong>${nice(n/60)} 分鐘</strong>` }; },
+
+  // ── 時間 life ──
+  life_time() {
+    const scenes = [
+      () => { const n=rFrom([60,90,120,150,180]); return { text:`一部動畫播放了 ${n} 分鐘，請問是幾小時？`, ans:nice(n/60), hint:`分鐘換小時，小換大，用除法。<br>${n} ÷ 60 = <strong>${nice(n/60)} 小時</strong>` }; },
+      () => { const n=rFrom([0.5,1,1.5,2,2.5]); return { text:`小華做功課做了 ${n} 小時，請問是幾分鐘？`, ans:nice(n*60), hint:`小時換分鐘，大換小，用乘法。<br>${n} × 60 = <strong>${nice(n*60)} 分鐘</strong>` }; },
+      () => { const n=rFrom([2,3,4,5,6,8,10,12,15]); return { text:`跑百米跑了 ${n} 分鐘，請問是幾秒？`, ans:nice(n*60), hint:`分鐘換秒，大換小，用乘法。<br>${n} × 60 = <strong>${nice(n*60)} 秒</strong>` }; },
+      () => { const n=rFrom([60,90,120,150,180,210,240]); return { text:`一場球賽打了 ${n} 分鐘，請問是幾小時？`, ans:nice(n/60), hint:`分鐘換小時，小換大，用除法。<br>${n} ÷ 60 = <strong>${nice(n/60)} 小時</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'time', type:'life', text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 面積 unit ──
+  m2_to_cm2() { const n = rFrom([1,2,3,4,5,0.5,1.5,2.5,0.25,0.75,3.5]); return { cat:'area', type:'unit', text:`${n} 平方公尺 = ? 平方公分`, ans:nice(n*10000), hint:`平方公尺換平方公分，大換小，用乘法。<br>1m² = 10000cm²，所以：<br>${n} × 10000 = <strong>${nice(n*10000)} 平方公分</strong>` }; },
+  cm2_to_m2() { const n = rFrom([10000,20000,30000,40000,50000,5000,15000,25000,7500]); return { cat:'area', type:'unit', text:`${n} 平方公分 = ? 平方公尺`, ans:nice(n/10000), hint:`平方公分換平方公尺，小換大，用除法。<br>10000cm² = 1m²，所以：<br>${n} ÷ 10000 = <strong>${nice(n/10000)} 平方公尺</strong>` }; },
+
+  // ── 面積 life ──
+  life_area() {
+    const scenes = [
+      () => { const l=rFrom([40,50,60,80,100]); const w=rFrom([30,40,50,60]); return { text:`一張桌子長 ${l} 公分、寬 ${w} 公分，面積是幾平方公分？`, ans:l*w, hint:`面積 = 長 × 寬<br>${l} × ${w} = <strong>${l*w} 平方公分</strong>` }; },
+      () => { const n=rFrom([2,3,4,5,6,8,10]); return { text:`一塊地板面積是 ${n} 平方公尺，請問是幾平方公分？`, ans:nice(n*10000), hint:`平方公尺換平方公分，大換小，用乘法。<br>${n} × 10000 = <strong>${nice(n*10000)} 平方公分</strong>` }; },
+      () => { const l=rFrom([20,25,30,40]); const w=rFrom([15,20,25,30]); return { text:`一本書封面長 ${l} 公分、寬 ${w} 公分，面積是幾平方公分？`, ans:l*w, hint:`面積 = 長 × 寬<br>${l} × ${w} = <strong>${l*w} 平方公分</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'area', type:'life', text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 體積 unit ──
+  L_to_cm3() { const n = rFrom([1,2,3,4,5,0.5,1.5,2.5,0.25,0.75]); return { cat:'vol3d', type:'unit', level:'basic', text:`${n} 公升 = ? 立方公分`, ans:nice(n*1000), hint:`1 公升 = 1000cm³，所以：<br>${n} × 1000 = <strong>${nice(n*1000)} 立方公分</strong>` }; },
+  cm3_to_L() { const n = rFrom([1000,2000,3000,4000,5000,500,1500,2500,750]); return { cat:'vol3d', type:'unit', level:'basic', text:`${n} 立方公分 = ? 公升`, ans:nice(n/1000), hint:`1000cm³ = 1 公升，所以：<br>${n} ÷ 1000 = <strong>${nice(n/1000)} 公升</strong>` }; },
+
+  // 體積進階（計算後換算）
+  vol3d_advanced() {
+    const adv = Math.random() < 0.5;
+    if (adv) {
+      // 長方體 cm³ → 公升
+      const l = rFrom([5,6,8,10]); const w = rFrom([4,5,6]); const h = rFrom([5,10,25,50]);
+      const vol = l*w*h;
+      const L = nice(vol/1000);
+      if (Number.isInteger(L) || (vol % 1000 === 0)) {
+        return { cat:'vol3d', type:'unit', level:'advanced',
+          text:`一個長方體水箱，長 ${l}cm、寬 ${w}cm、高 ${h}cm，體積是幾公升？`,
+          ans: L,
+          hint:`體積 = ${l} × ${w} × ${h} = ${vol} cm³<br>再換算：${vol} ÷ 1000 = <strong>${L} 公升</strong>` };
+      }
+    }
+    // 正方體 cm³ → 公升
+    const s = rFrom([10,20]);
+    const vol = s*s*s;
+    const L = nice(vol/1000);
+    return { cat:'vol3d', type:'unit', level:'advanced',
+      text:`一個正方體水箱邊長 ${s}cm，體積是幾公升？`,
+      ans: L,
+      hint:`體積 = ${s} × ${s} × ${s} = ${vol} cm³<br>再換算：${vol} ÷ 1000 = <strong>${L} 公升</strong>` };
+  },
+
+  // ── 體積 life ──
+  life_vol3d() {
+    const scenes = [
+      () => { const s=rFrom([3,4,5,6,8,10]); return { text:`一個正方體積木邊長 ${s} 公分，體積是幾立方公分？`, ans:s*s*s, hint:`正方體體積 = 邊長 × 邊長 × 邊長<br>${s} × ${s} × ${s} = <strong>${s*s*s} 立方公分</strong>` }; },
+      () => { const l=rFrom([5,6,8,10]); const w=rFrom([4,5,6]); const h=rFrom([3,4,5]); return { text:`一個長方體水箱，長 ${l}cm、寬 ${w}cm、高 ${h}cm，體積是幾立方公分？`, ans:l*w*h, hint:`體積 = 長 × 寬 × 高<br>${l} × ${w} × ${h} = <strong>${l*w*h} 立方公分</strong>` }; },
+      () => { const n=rFrom([1,2,3,4,5,1.5,2.5]); return { text:`一個水桶裝了 ${nice(n*1000)} 立方公分的水，請問是幾公升？`, ans:n, hint:`1000cm³ = 1 公升，所以：<br>${nice(n*1000)} ÷ 1000 = <strong>${n} 公升</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'vol3d', type:'life', text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 分數換算 unit（各類別通用，基礎）──
+  frac_unit(cat) {
+    const fracs = [
+      { sym:'½', val:0.5 }, { sym:'¼', val:0.25 }, { sym:'¾', val:0.75 },
+      { sym:'⅕', val:0.2 }, { sym:'⅖', val:0.4  }, { sym:'⅗', val:0.6 },
+    ];
+    const allConv = {
+      weight: [{ from:'公斤', to:'公克', mul:1000 }],
+      volume: [{ from:'公升', to:'毫升', mul:1000 }],
+      length: [{ from:'公尺', to:'公分', mul:100  }, { from:'公里', to:'公尺', mul:1000 }],
+      time:   [{ from:'小時', to:'分鐘', mul:60   }],
+      area:   [{ from:'平方公尺', to:'平方公分', mul:10000 }],
+    };
+    const convList = allConv[cat] || [
+      { from:'公斤', to:'公克', mul:1000 },
+      { from:'公升', to:'毫升', mul:1000 },
+      { from:'公尺', to:'公分', mul:100  },
+      { from:'小時', to:'分鐘', mul:60   },
+    ];
+    const f = rFrom(fracs);
+    const c = rFrom(convList);
+    const ans = nice(f.val * c.mul);
+    return { cat: cat || 'length', type:'unit', level:'basic',
+      text:`${f.sym} ${c.from} = ? ${c.to}`,
+      ans, hint:`先把分數換成小數：${f.sym} = ${f.val}<br>${c.from}換${c.to}要乘 ${c.mul}，所以：<br>${f.val} × ${c.mul} = <strong>${ans} ${c.to}</strong>` };
+  },
+
+  // ── 長度 分數/小數進階 ──
+  length_frac_adv() {
+    const scenes = [
+      // 假分數長度
+      () => {
+        const pool = [
+          {n:3,d:2,dec:1.5},{n:5,d:4,dec:1.25},{n:7,d:4,dec:1.75},
+          {n:6,d:5,dec:1.2},{n:7,d:5,dec:1.4},{n:9,d:5,dec:1.8},
+          {n:11,d:10,dec:1.1},{n:13,d:10,dec:1.3},
+        ];
+        const f = rFrom(pool);
+        const units = rFrom([
+          {from:'公尺',to:'公分',mul:100},
+          {from:'公里',to:'公尺',mul:1000},
+        ]);
+        const ans = nice(f.dec * units.mul);
+        return { text:`${f.n}/${f.d} ${units.from} = ? ${units.to}`, ans,
+          hint:`${f.n}/${f.d} = ${f.dec}，再乘 ${units.mul}：${f.dec} × ${units.mul} = <strong>${ans} ${units.to}</strong>` };
+      },
+      // 帶分數長度
+      () => {
+        const whole = rFrom([1,2,3]);
+        const fracs = [{sym:'½',dec:0.5},{sym:'¼',dec:0.25},{sym:'¾',dec:0.75},{sym:'⅕',dec:0.2},{sym:'⅖',dec:0.4}];
+        const f = rFrom(fracs);
+        const dec = parseFloat((whole+f.dec).toFixed(4));
+        const units = rFrom([
+          {from:'公尺',to:'公分',mul:100},
+          {from:'公里',to:'公尺',mul:1000},
+        ]);
+        const ans = nice(dec * units.mul);
+        return { text:`${whole} 又 ${f.sym} ${units.from} = ? ${units.to}`, ans,
+          hint:`${whole} + ${f.sym}（= ${f.dec}）= ${dec} ${units.from}<br>${dec} × ${units.mul} = <strong>${ans} ${units.to}</strong>` };
+      },
+      // 小數長度換算
+      () => {
+        const dec = rFrom([0.5,0.25,0.75,1.5,2.5,0.8,1.2,0.6,1.4]);
+        const units = rFrom([
+          {from:'公尺',to:'公分',mul:100},
+          {from:'公里',to:'公尺',mul:1000},
+          {from:'公分',to:'公厘',mul:10},
+        ]);
+        const ans = nice(dec * units.mul);
+        return { text:`${dec} ${units.from} = ? ${units.to}`, ans,
+          hint:`${dec} × ${units.mul} = <strong>${ans} ${units.to}</strong>` };
+      },
+    ];
+    const q = rFrom(scenes)();
+    return { cat:'length', type:'unit', level:'advanced', text:q.text, ans:q.ans, hint:q.hint };
+  },
+
+  // ── 重量 分數/小數進階 ──
+  weight_frac_adv() {
+    const scenes = [
+      // 假分數重量
+      () => {
+        const pool = [
+          {n:3,d:2,dec:1.5},{n:5,d:4,dec:1.25},{n:7,d:4,dec:1.75},
+          {n:6,d:5,dec:1.2},{n:7,d:5,dec:1.4},{n:8,d:5,dec:1.6},{n:9,d:5,dec:1.8},
+        ];
+        const f = rFrom(pool);
+        const ans = nice(f.dec * 1000);
+        return { text:`${f.n}/${f.d} 公斤 = ? 公克`, ans,
+          hint:`${f.n}/${f.d} = ${f.dec}，${f.dec} × 1000 = <strong>${ans} 公克</strong>` };
+      },
+      // 帶分數重量
+      () => {
+        const whole = rFrom([1,2,3,4,5]);
+        const fracs = [{sym:'½',dec:0.5},{sym:'¼',dec:0.25},{sym:'¾',dec:0.75},{sym:'⅕',dec:0.2},{sym:'⅖',dec:0.4}];
+        const f = rFrom(fracs);
+        const dec = parseFloat((whole+f.dec).toFixed(4));
+        const ans = nice(dec * 1000);
+        return { text:`${whole} 又 ${f.sym} 公斤 = ? 公克`, ans,
+          hint:`${whole} + ${f.sym}（= ${f.dec}）= ${dec} 公斤<br>${dec} × 1000 = <strong>${ans} 公克</strong>` };
+      },
+      // 小數重量
+      () => {
+        const dec = rFrom([0.5,0.25,0.75,1.5,2.5,0.8,1.2,0.6,1.4,3.5,0.125,0.375]);
+        const dir = Math.random() < 0.5;
+        if (dir) {
+          return { text:`${dec} 公斤 = ? 公克`, ans:nice(dec*1000),
+            hint:`${dec} × 1000 = <strong>${nice(dec*1000)} 公克</strong>` };
+        } else {
+          const g = rFrom([250,500,750,1250,1500,1750,2500,3500]);
+          return { text:`${g} 公克 = ? 公斤`, ans:nice(g/1000),
+            hint:`${g} ÷ 1000 = <strong>${nice(g/1000)} 公斤</strong>` };
+        }
+      },
+    ];
+    const q = rFrom(scenes)();
+    return { cat:'weight', type:'unit', level:'advanced', text:q.text, ans:q.ans, hint:q.hint };
+  },
+
+  // ── 容量 分數/小數進階 ──
+  volume_frac_adv() {
+    const scenes = [
+      // 假分數容量
+      () => {
+        const pool = [
+          {n:3,d:2,dec:1.5},{n:5,d:4,dec:1.25},{n:7,d:4,dec:1.75},
+          {n:6,d:5,dec:1.2},{n:7,d:5,dec:1.4},{n:8,d:5,dec:1.6},{n:9,d:5,dec:1.8},
+        ];
+        const f = rFrom(pool);
+        const ans = nice(f.dec * 1000);
+        return { text:`${f.n}/${f.d} 公升 = ? 毫升`, ans,
+          hint:`${f.n}/${f.d} = ${f.dec}，${f.dec} × 1000 = <strong>${ans} 毫升</strong>` };
+      },
+      // 帶分數容量
+      () => {
+        const whole = rFrom([1,2,3,4]);
+        const fracs = [{sym:'½',dec:0.5},{sym:'¼',dec:0.25},{sym:'¾',dec:0.75},{sym:'⅕',dec:0.2},{sym:'⅖',dec:0.4}];
+        const f = rFrom(fracs);
+        const dec = parseFloat((whole+f.dec).toFixed(4));
+        const ans = nice(dec * 1000);
+        return { text:`${whole} 又 ${f.sym} 公升 = ? 毫升`, ans,
+          hint:`${whole} + ${f.sym}（= ${f.dec}）= ${dec} 公升<br>${dec} × 1000 = <strong>${ans} 毫升</strong>` };
+      },
+      // 小數容量
+      () => {
+        const dec = rFrom([0.5,0.25,0.75,1.5,2.5,0.8,1.2,0.6,1.4,0.125,0.375]);
+        return { text:`${dec} 公升 = ? 毫升`, ans:nice(dec*1000),
+          hint:`${dec} × 1000 = <strong>${nice(dec*1000)} 毫升</strong>` };
+      },
+    ];
+    const q = rFrom(scenes)();
+    return { cat:'volume', type:'unit', level:'advanced', text:q.text, ans:q.ans, hint:q.hint };
+  },
+
+  // ── 時間 分數/小數進階 ──
+  time_frac_adv() {
+    const scenes = [
+      // 假分數時間
+      () => {
+        const pool = [
+          {n:3,d:2,dec:1.5},{n:5,d:4,dec:1.25},{n:7,d:4,dec:1.75},
+          {n:5,d:2,dec:2.5},{n:7,d:2,dec:3.5},
+        ];
+        const f = rFrom(pool);
+        const ans = nice(f.dec * 60);
+        return { text:`${f.n}/${f.d} 小時 = ? 分鐘`, ans,
+          hint:`${f.n}/${f.d} = ${f.dec}，${f.dec} × 60 = <strong>${ans} 分鐘</strong>` };
+      },
+      // 帶分數時間
+      () => {
+        const whole = rFrom([1,2,3]);
+        const fracs = [{sym:'½',dec:0.5},{sym:'¼',dec:0.25},{sym:'¾',dec:0.75},{sym:'⅓',dec:0.333}];
+        const f = rFrom(fracs);
+        const dec = parseFloat((whole+f.dec).toFixed(3));
+        const ans = Math.round(dec * 60);
+        return { text:`${whole} 又 ${f.sym} 小時 = ? 分鐘`, ans,
+          hint:`${whole} + ${f.sym}（≈ ${f.dec}）= ${dec} 小時<br>${dec} × 60 ≈ <strong>${ans} 分鐘</strong>` };
+      },
+      // 小數時間
+      () => {
+        const pool = [
+          {dec:0.5,  ans:30,  hint:'0.5 × 60 = <strong>30 分鐘</strong>'},
+          {dec:0.25, ans:15,  hint:'0.25 × 60 = <strong>15 分鐘</strong>'},
+          {dec:0.75, ans:45,  hint:'0.75 × 60 = <strong>45 分鐘</strong>'},
+          {dec:1.5,  ans:90,  hint:'1.5 × 60 = <strong>90 分鐘</strong>'},
+          {dec:2.5,  ans:150, hint:'2.5 × 60 = <strong>150 分鐘</strong>'},
+        ];
+        const p = rFrom(pool);
+        return { text:`${p.dec} 小時 = ? 分鐘`, ans:p.ans, hint:p.hint };
+      },
+    ];
+    const q = rFrom(scenes)();
+    return { cat:'time', type:'unit', level:'advanced', text:q.text, ans:q.ans, hint:q.hint };
+  },
+  // ── 周長 unit ──
+  perim_square() {
+    const s = rFrom([3,4,5,6,7,8,10,12,15,20,25]);
+    const advanced = Math.random() < 0.4; // 40% 機率出進階題
+    if (advanced) {
+      const cm = s * 4;
+      const m = nice(cm / 100);
+      return { cat:'perim', type:'unit', level:'advanced',
+        text:`正方形邊長 ${s} 公分，周長是幾公尺？`,
+        ans: m,
+        hint:`先算周長：${s} × 4 = ${cm} 公分<br>再換單位：${cm} 公分 ÷ 100 = <strong>${m} 公尺</strong>` };
+    }
+    return { cat:'perim', type:'unit', level:'basic',
+      text:`正方形邊長 ${s} 公分，周長是幾公分？`,
+      ans: s*4,
+      hint:`正方形周長 = 邊長 × 4<br>${s} × 4 = <strong>${s*4} 公分</strong>` };
+  },
+  perim_rect() {
+    const l = rFrom([8,10,12,15,18,20,25,30]);
+    const w = rFrom([4,5,6,8,10,12,15]);
+    const perimCm = (l+w)*2;
+    const advanced = Math.random() < 0.4;
+    if (advanced) {
+      const m = nice(perimCm / 100);
+      return { cat:'perim', type:'unit', level:'advanced',
+        text:`長方形長 ${l} 公分、寬 ${w} 公分，周長是幾公尺？`,
+        ans: m,
+        hint:`先算周長：（${l} + ${w}）× 2 = ${perimCm} 公分<br>再換單位：${perimCm} ÷ 100 = <strong>${m} 公尺</strong>` };
+    }
+    return { cat:'perim', type:'unit', level:'basic',
+      text:`長方形長 ${l} 公分、寬 ${w} 公分，周長是幾公分？`,
+      ans: perimCm,
+      hint:`長方形周長 = （長 + 寬）× 2<br>（${l} + ${w}）× 2 = <strong>${perimCm} 公分</strong>` };
+  },
+  perim_find_side() {
+    const s = rFrom([4,5,6,7,8,10,12,15]);
+    return { cat:'perim', type:'unit', level:'basic',
+      text:`正方形周長是 ${s*4} 公分，邊長是幾公分？`,
+      ans: s,
+      hint:`邊長 = 周長 ÷ 4<br>${s*4} ÷ 4 = <strong>${s} 公分</strong>` };
+  },
+  perim_find_width() {
+    const l = rFrom([10,12,15,18,20]);
+    const w = rFrom([4,5,6,8,10]);
+    return { cat:'perim', type:'unit', level:'basic',
+      text:`長方形周長 ${(l+w)*2} 公分、長 ${l} 公分，寬是幾公分？`,
+      ans: w,
+      hint:`寬 = 周長 ÷ 2 - 長<br>${(l+w)*2} ÷ 2 = ${l+w}，${l+w} - ${l} = <strong>${w} 公分</strong>` };
+  },
+
+  // ── 周長 life ──
+  life_perim() {
+    const scenes = [
+      () => { const s=rFrom([5,8,10,12,15,20]); return { level:'basic', text:`一塊正方形地板邊長 ${s} 公尺，沿邊走一圈是幾公尺？`, ans:s*4, hint:`周長 = 邊長 × 4<br>${s} × 4 = <strong>${s*4} 公尺</strong>` }; },
+      () => { const l=rFrom([12,15,20,25,30]); const w=rFrom([6,8,10,12]); return { level:'basic', text:`學校花圃長 ${l} 公尺、寬 ${w} 公尺，圍一圈籬笆需要幾公尺？`, ans:(l+w)*2, hint:`周長 = （長 + 寬）× 2<br>（${l} + ${w}）× 2 = <strong>${(l+w)*2} 公尺</strong>` }; },
+      () => { const s=rFrom([6,8,10,15,20]); return { level:'basic', text:`正方形操場邊長 ${s} 公尺，跑一圈是幾公尺？`, ans:s*4, hint:`周長 = 邊長 × 4<br>${s} × 4 = <strong>${s*4} 公尺</strong>` }; },
+      () => { const l=rFrom([10,12,15,18]); const w=rFrom([5,6,8,10]); return { level:'basic', text:`長方形游泳池長 ${l} 公尺、寬 ${w} 公尺，沿邊走一圈是幾公尺？`, ans:(l+w)*2, hint:`周長 = （長 + 寬）× 2<br>（${l} + ${w}）× 2 = <strong>${(l+w)*2} 公尺</strong>` }; },
+      // 進階：公分算完換公尺
+      () => { const l=rFrom([120,150,180,200,250]); const w=rFrom([60,80,100,120]); const cm=(l+w)*2; const m=nice(cm/100); return { level:'advanced', text:`長方形花圃長 ${l} 公分、寬 ${w} 公分，圍一圈籬笆需要幾公尺？`, ans:m, hint:`周長 = （${l} + ${w}）× 2 = ${cm} 公分<br>換算：${cm} ÷ 100 = <strong>${m} 公尺</strong>` }; },
+      () => { const s=rFrom([50,80,100,120,150,200]); const cm=s*4; const m=nice(cm/100); return { level:'advanced', text:`正方形廣場邊長 ${s} 公分，跑一圈是幾公尺？`, ans:m, hint:`周長 = ${s} × 4 = ${cm} 公分<br>換算：${cm} ÷ 100 = <strong>${m} 公尺</strong>` }; },
+    ];
+    const s = rFrom(scenes)();
+    return { cat:'perim', type:'life', level:s.level, text:s.text, ans:s.ans, hint:s.hint };
+  },
+
+  // ── 分數應用題 unit（動態，基礎30% 進階70%）──
+  frac_app() {
+    // 基礎場景（較直接）
+    const basicScenes = [
+      () => {
+        const n = rFrom([2,3,4,5,6,7,8,9]);
+        const unit = rFrom(['公尺','公升','公斤','公分']);
+        return { level:'basic', text:`${n}/10 ${unit} 是幾個 1/10 ${unit}？`, ans:n,
+          hint:`分子就是個數：${n}/10 = ${n} 個 1/10，答案是 <strong>${n} 個</strong>` };
+      },
+      () => {
+        const n = rFrom([1,2,3,4,5,6,7,8,9]);
+        const unit = rFrom(['公尺','公升','公斤','公分']);
+        return { level:'basic', text:`0.${n} ${unit} 用分數表示，分子是幾？（分母是 10）`, ans:n,
+          hint:`0.${n} = ${n}/10，分子是 <strong>${n}</strong>` };
+      },
+      () => {
+        const pool = [
+          {n:1,d:2,dec:0.5},{n:1,d:4,dec:0.25},{n:3,d:4,dec:0.75},
+          {n:1,d:5,dec:0.2},{n:2,d:5,dec:0.4},{n:3,d:5,dec:0.6},{n:4,d:5,dec:0.8},
+          {n:1,d:10,dec:0.1},{n:3,d:10,dec:0.3},{n:7,d:10,dec:0.7},{n:9,d:10,dec:0.9},
+        ];
+        const f = rFrom(pool);
+        const unit = rFrom(['條緞帶','公尺','公升','公斤','公分']);
+        return { level:'basic', text:`${f.n}/${f.d} ${unit}，用小數表示是多少？`, ans:f.dec,
+          hint:`${f.n} ÷ ${f.d} = <strong>${f.dec}</strong>` };
+      },
+    ];
+
+    // 進階場景（需要多步思考）
+    const advScenes = [
+      // n/10 是幾個 1/100
+      () => {
+        const n = rFrom([1,2,3,4,5,6,7,8,9]);
+        const unit = rFrom(['公尺','公升','公斤']);
+        return { level:'advanced', text:`${n}/10 ${unit} 是幾個 1/100 ${unit}？`, ans:n*10,
+          hint:`1/10 = 10/100，所以 ${n}/10 = ${n*10}/100，是 <strong>${n*10} 個</strong> 1/100` };
+      },
+      // n/100 是幾個 1/100
+      () => {
+        const n = rFrom([3,5,7,8,12,15,20,25,30,35,40,50,75]);
+        const unit = rFrom(['公尺','公升','公分']);
+        return { level:'advanced', text:`${n}/100 ${unit} 是幾個 1/100 ${unit}？`, ans:n,
+          hint:`分子就是個數：${n}/100 = ${n} 個 1/100，答案是 <strong>${n} 個</strong>` };
+      },
+      // 假分數 → 小數
+      () => {
+        const pool = [
+          {n:3,d:2,dec:1.5},{n:5,d:4,dec:1.25},{n:7,d:4,dec:1.75},
+          {n:6,d:5,dec:1.2},{n:7,d:5,dec:1.4},{n:8,d:5,dec:1.6},{n:9,d:5,dec:1.8},
+          {n:11,d:10,dec:1.1},{n:13,d:10,dec:1.3},{n:17,d:10,dec:1.7},
+        ];
+        const f = rFrom(pool);
+        const unit = rFrom(['公尺','公升','公斤']);
+        return { level:'advanced', text:`${f.n}/${f.d} ${unit}，用小數表示是多少？`, ans:f.dec,
+          hint:`假分數：${f.n} ÷ ${f.d} = <strong>${f.dec}</strong>` };
+      },
+      // 小數 → 分數分子（分母100）
+      () => {
+        const n = rFrom([5,10,15,20,25,30,40,50,60,75,80]);
+        const dec = n < 10 ? `0.0${n}` : `0.${n}`;
+        return { level:'advanced', text:`${dec} 用分數表示，分子是幾？（分母是 100）`, ans:n,
+          hint:`${dec} = ${n}/100，分子是 <strong>${n}</strong>` };
+      },
+      // 帶小數整體 → 分數分子
+      () => {
+        const whole = rFrom([1,2,3,4,5,6,7,8,9]);
+        const dec = rFrom([1,2,3,4,5,6,7,8,9]);
+        return { level:'advanced', text:`${whole}.${dec} 的小數部分 0.${dec}，用分數表示分子是幾？（分母是 10）`, ans:dec,
+          hint:`0.${dec} = ${dec}/10，分子是 <strong>${dec}</strong>` };
+      },
+    ];
+
+    // 70% 出進階，30% 出基礎
+    const pool = Math.random() < 0.7 ? advScenes : basicScenes;
+    let q = null;
+    for (let i = 0; i < 5; i++) { q = rFrom(pool)(); if (q) break; }
+    if (!q) q = { level:'basic', text:'3/10 公尺是幾個 1/10 公尺？', ans:3, hint:'分子就是個數，答案是 <strong>3 個</strong>' };
+    return { cat:'perim', type:'unit', level:q.level, text:q.text, ans:q.ans, hint:q.hint };
+  },
+
+  // ── 帶分數 / 假分數 / 整體幾分之幾 life（基礎30% 進階70%）──
+  life_frac_app() {
+    // 基礎場景
+    const basicScenes = [
+      // 整數.小數 → 分數分子
+      () => {
+        const whole = rFrom([1,2,3,4,5,6,7,8]);
+        const dec = rFrom([1,2,3,4,5,6,7,8,9]);
+        return { level:'basic',
+          text:`${whole}.${dec} 的小數部分 0.${dec}，用幾分之幾表示？填分子（分母是 10）`,
+          ans:dec, hint:`0.${dec} = ${dec}/10，分子是 <strong>${dec}</strong>` };
+      },
+      // 小數 → 分數（各種小數）
+      () => {
+        const pool = [
+          {text:'0.6 用分數表示，分子是幾？（分母是 10）', ans:6, hint:'0.6 = 6/10，分子是 <strong>6</strong>'},
+          {text:'7.9 的小數部分 0.9 用分數表示，分子是幾？（分母是 10）', ans:9, hint:'0.9 = 9/10，分子是 <strong>9</strong>'},
+          {text:'4.8 的小數部分 0.8 用分數表示，分子是幾？（分母是 10）', ans:8, hint:'0.8 = 8/10，分子是 <strong>8</strong>'},
+          {text:'3.5 的小數部分 0.5 用分數表示，分子是幾？（分母是 10）', ans:5, hint:'0.5 = 5/10，分子是 <strong>5</strong>'},
+          {text:'0.3 用分數表示，分子是幾？（分母是 10）', ans:3, hint:'0.3 = 3/10，分子是 <strong>3</strong>'},
+          {text:'2.7 的小數部分 0.7 用分數表示，分子是幾？（分母是 10）', ans:7, hint:'0.7 = 7/10，分子是 <strong>7</strong>'},
+        ];
+        return { level:'basic', ...rFrom(pool) };
+      },
+      // 整體的幾分之幾有幾個（整除配置）
+      () => {
+        const configs = [
+          {total:8, n:1,d:2},{total:12,n:1,d:2},{total:16,n:1,d:2},
+          {total:20,n:1,d:4},{total:24,n:1,d:3},{total:30,n:1,d:5},
+        ];
+        const c = rFrom(configs);
+        const ans = c.total * c.n / c.d;
+        const cts = [
+          {thing:'月餅',unit:'個',con:'盒'},{thing:'蘋果',unit:'顆',con:'箱'},
+          {thing:'糖果',unit:'顆',con:'包'},{thing:'餅乾',unit:'片',con:'盒'},
+        ];
+        const ct = rFrom(cts);
+        return { level:'basic',
+          text:`一${ct.con}${ct.thing}有 ${c.total} ${ct.unit}，${c.n}/${c.d} ${ct.con}有幾${ct.unit}${ct.thing}？`,
+          ans, hint:`${c.total} ÷ ${c.d} × ${c.n} = <strong>${ans} ${ct.unit}</strong>` };
+      },
+    ];
+
+    // 進階場景
+    const advScenes = [
+      // 帶分數 → 小數（動態，多種情境）
+      () => {
+        const whole = rFrom([1,2,3,4,5,6]);
+        const fracs = [
+          {sym:'1/2',dec:0.5},{sym:'1/4',dec:0.25},{sym:'3/4',dec:0.75},
+          {sym:'1/5',dec:0.2},{sym:'2/5',dec:0.4},{sym:'3/5',dec:0.6},{sym:'4/5',dec:0.8},
+          {sym:'1/10',dec:0.1},{sym:'3/10',dec:0.3},{sym:'7/10',dec:0.7},
+        ];
+        const f = rFrom(fracs);
+        const dec = parseFloat((whole + f.dec).toFixed(4));
+        const items = [
+          `${whole} 又 ${f.sym} 公斤的西瓜，用小數表示是幾公斤？`,
+          `${whole} 又 ${f.sym} 公尺的布，用小數表示是幾公尺？`,
+          `${whole} 又 ${f.sym} 公升的果汁，用小數表示是幾公升？`,
+          `玉米重 ${whole} 又 ${f.sym} 公斤，用小數表示是幾公斤？`,
+          `一條繩子長 ${whole} 又 ${f.sym} 公尺，用小數表示是幾公尺？`,
+        ];
+        return { level:'advanced', text:rFrom(items), ans:dec,
+          hint:`${whole} + ${f.sym}（= ${f.dec}）= <strong>${dec}</strong>` };
+      },
+      // 整體的幾分之幾（較難分數）
+      () => {
+        const configs = [
+          {total:16,n:3,d:4},{total:20,n:3,d:4},{total:20,n:2,d:5},{total:20,n:3,d:5},
+          {total:24,n:2,d:3},{total:30,n:2,d:5},{total:30,n:3,d:5},{total:30,n:4,d:5},
+          {total:40,n:3,d:4},{total:40,n:2,d:5},
+        ];
+        const c = rFrom(configs);
+        const ans = c.total * c.n / c.d;
+        const cts = [
+          {thing:'月餅',unit:'個',con:'盒'},{thing:'蘋果',unit:'顆',con:'箱'},
+          {thing:'糖果',unit:'顆',con:'包'},{thing:'橘子',unit:'顆',con:'袋'},
+          {thing:'葡萄',unit:'顆',con:'串'},
+        ];
+        const ct = rFrom(cts);
+        return { level:'advanced',
+          text:`一${ct.con}${ct.thing}有 ${c.total} ${ct.unit}，${c.n}/${c.d} ${ct.con}有幾${ct.unit}${ct.thing}？`,
+          ans, hint:`${c.total} ÷ ${c.d} × ${c.n} = <strong>${ans} ${ct.unit}</strong>` };
+      },
+      // 等值分數情境（6/8 = 3/4 等）
+      () => {
+        const equivs = [
+          {text:'一盒月餅有 16 個，6/8 盒有幾個月餅？（6/8 = 3/4）', ans:12, hint:'6/8 = 3/4，16 × 3/4 = <strong>12 個</strong>'},
+          {text:'一盒餅乾有 24 片，4/8 盒有幾片餅乾？（4/8 = 1/2）', ans:12, hint:'4/8 = 1/2，24 × 1/2 = <strong>12 片</strong>'},
+          {text:'一箱蘋果有 12 顆，4/6 箱有幾顆？（4/6 = 2/3）', ans:8, hint:'4/6 = 2/3，12 × 2/3 = <strong>8 顆</strong>'},
+          {text:'一包糖果有 20 顆，6/10 包有幾顆？（6/10 = 3/5）', ans:12, hint:'6/10 = 3/5，20 × 3/5 = <strong>12 顆</strong>'},
+          {text:'一袋橘子有 30 顆，4/10 袋有幾顆？（4/10 = 2/5）', ans:12, hint:'4/10 = 2/5，30 × 2/5 = <strong>12 顆</strong>'},
+        ];
+        return { level:'advanced', ...rFrom(equivs) };
+      },
+      // 假分數情境題
+      () => {
+        const pool = [
+          {text:'小明喝了 3/2 公升的水，用小數表示是幾公升？', ans:1.5, hint:'3 ÷ 2 = <strong>1.5</strong> 公升'},
+          {text:'一條繩子長 7/4 公尺，用小數表示是幾公尺？', ans:1.75, hint:'7 ÷ 4 = <strong>1.75</strong> 公尺'},
+          {text:'媽媽買了 9/5 公斤的豬肉，用小數表示是幾公斤？', ans:1.8, hint:'9 ÷ 5 = <strong>1.8</strong> 公斤'},
+          {text:'一桶水重 11/10 公斤，用小數表示是幾公斤？', ans:1.1, hint:'11 ÷ 10 = <strong>1.1</strong> 公斤'},
+          {text:'小華跑了 5/4 公里，用小數表示是幾公里？', ans:1.25, hint:'5 ÷ 4 = <strong>1.25</strong> 公里'},
+          {text:'一袋麵粉重 8/5 公斤，用小數表示是幾公斤？', ans:1.6, hint:'8 ÷ 5 = <strong>1.6</strong> 公斤'},
+          {text:'游泳池水深 13/10 公尺，用小數表示是幾公尺？', ans:1.3, hint:'13 ÷ 10 = <strong>1.3</strong> 公尺'},
+          {text:'一瓶汽水有 6/5 公升，用小數表示是幾公升？', ans:1.2, hint:'6 ÷ 5 = <strong>1.2</strong> 公升'},
+        ];
+        return { level:'advanced', ...rFrom(pool) };
+      },
+      // 小數 → 分數（分母100，較難）
+      () => {
+        const pool = [
+          {text:'0.25 用分數表示，分子是幾？（分母是 100）', ans:25, hint:'0.25 = 25/100，分子是 <strong>25</strong>'},
+          {text:'0.75 用分數表示，分子是幾？（分母是 100）', ans:75, hint:'0.75 = 75/100，分子是 <strong>75</strong>'},
+          {text:'0.15 用分數表示，分子是幾？（分母是 100）', ans:15, hint:'0.15 = 15/100，分子是 <strong>15</strong>'},
+          {text:'0.04 用分數表示，分子是幾？（分母是 100）', ans:4, hint:'0.04 = 4/100，分子是 <strong>4</strong>'},
+          {text:'0.60 用分數表示，分子是幾？（分母是 100）', ans:60, hint:'0.60 = 60/100，分子是 <strong>60</strong>'},
+        ];
+        return { level:'advanced', ...rFrom(pool) };
+      },
+    ];
+
+    // 70% 出進階，30% 出基礎
+    const pool = Math.random() < 0.7 ? advScenes : basicScenes;
+    const q = rFrom(pool)();
+    return { cat:'perim', type:'life', level:q.level, text:q.text, ans:q.ans, hint:q.hint };
+  },
+
+};
+function genQ(cat, type) {
+  // frac_unit 需要知道 cat，用包裝函式傳入
+  const fracUnit = () => QGen.frac_unit(cat);
+
+  const unitGens = {
+    length:  [QGen.km_to_m, QGen.m_to_km, QGen.m_to_cm, QGen.cm_to_m, QGen.cm_to_mm, QGen.mm_to_cm, fracUnit, QGen.length_frac_adv, QGen.length_frac_adv],
+    weight:  [QGen.kg_to_g, QGen.g_to_kg, fracUnit, QGen.weight_frac_adv, QGen.weight_frac_adv],
+    volume:  [QGen.L_to_mL, QGen.mL_to_L, fracUnit, QGen.volume_frac_adv, QGen.volume_frac_adv],
+    time:    [QGen.h_to_min, QGen.min_to_h, QGen.min_to_s, QGen.s_to_min, fracUnit, QGen.time_frac_adv, QGen.time_frac_adv],
+    area:    [QGen.m2_to_cm2, QGen.cm2_to_m2, fracUnit],
+    vol3d:   [QGen.L_to_cm3, QGen.cm3_to_L, QGen.vol3d_advanced],
+    perim:   [QGen.perim_square, QGen.perim_rect, QGen.perim_find_side, QGen.perim_find_width],
+    fracapp: [QGen.frac_app],
+  };
+  const lifeGens = {
+    length:  [QGen.life_length],
+    weight:  [QGen.life_weight],
+    volume:  [QGen.life_volume],
+    time:    [QGen.life_time],
+    area:    [QGen.life_area],
+    vol3d:   [QGen.life_vol3d],
+    perim:   [QGen.life_perim],
+    fracapp: [QGen.life_frac_app],
+  };
+
+  let pool;
+  if (cat === 'all') {
+    // 「全部」模式：用加權抽類別
+    // 長度/重量/容量 各佔約 3.3%（共 10%）
+    // 時間/面積/體積/周長/分數應用 各佔約 18%（共 90%）
+    const weightedCats = [
+      'length', // ~3.3%
+      'weight', // ~3.3%
+      'volume', // ~3.3%
+      'time', 'time', 'time', 'time', 'time', 'time',       // ~20%
+      'area', 'area', 'area', 'area', 'area', 'area',       // ~20%
+      'vol3d', 'vol3d', 'vol3d', 'vol3d', 'vol3d', 'vol3d', // ~20%
+      'perim', 'perim', 'perim', 'perim', 'perim', 'perim', // ~20%
+      'fracapp','fracapp','fracapp','fracapp','fracapp','fracapp', // ~20%
+    ];
+    const pickedCat = rFrom(weightedCats);
+    const genList = type === 'unit' ? unitGens : lifeGens;
+    pool = genList[pickedCat];
+    const q = rFrom(pool)();
+    q.cat = pickedCat;
+    return q;
+  }
+
+  const gens = type === 'unit' ? unitGens : lifeGens;
+  pool = gens[cat] || (type === 'unit' ? unitGens.length : lifeGens.length);
+  const q = rFrom(pool)();
+  q.cat = cat;
+  return q;
+}
+
+// ── 分數↔小數 動態題目產生器 ──
+let fracType = 'all'; // 'all' | 'frac2dec' | 'dec2frac' | 'mixed' | 'improper'
+
+const FRACS = [
+  { n:1, d:2,  dec:0.5,   sym:'½'    },
+  { n:1, d:4,  dec:0.25,  sym:'¼'    },
+  { n:3, d:4,  dec:0.75,  sym:'¾'    },
+  { n:1, d:5,  dec:0.2,   sym:'⅕'    },
+  { n:2, d:5,  dec:0.4,   sym:'⅖'    },
+  { n:3, d:5,  dec:0.6,   sym:'⅗'    },
+  { n:4, d:5,  dec:0.8,   sym:'⅘'    },
+  { n:1, d:10, dec:0.1,   sym:'1/10'  },
+  { n:3, d:10, dec:0.3,   sym:'3/10'  },
+  { n:7, d:10, dec:0.7,   sym:'7/10'  },
+  { n:9, d:10, dec:0.9,   sym:'9/10'  },
+  { n:1, d:8,  dec:0.125, sym:'1/8'   },
+  { n:3, d:8,  dec:0.375, sym:'3/8'   },
+  { n:5, d:8,  dec:0.625, sym:'5/8'   },
+  { n:7, d:8,  dec:0.875, sym:'7/8'   },
 ];
 
-const FQs = [
-  {cat:'weight', text:'½ 公斤 = ? 公克',  ans:500,  hint:'先把分數換成小數：½ = 0.5<br>公斤換公克要乘 1000，所以：<br>0.5 × 1000 = <strong>500 公克</strong>'},
-  {cat:'volume', text:'¼ 公升 = ? 毫升',  ans:250,  hint:'先把分數換成小數：¼ = 0.25<br>公升換毫升要乘 1000，所以：<br>0.25 × 1000 = <strong>250 毫升</strong>'},
-  {cat:'length', text:'¾ 公尺 = ? 公分',  ans:75,   hint:'先把分數換成小數：¾ = 0.75<br>公尺換公分要乘 100，所以：<br>0.75 × 100 = <strong>75 公分</strong>'},
-  {cat:'length', text:'½ 公里 = ? 公尺',  ans:500,  hint:'先把分數換成小數：½ = 0.5<br>公里換公尺要乘 1000，所以：<br>0.5 × 1000 = <strong>500 公尺</strong>'},
-  {cat:'weight', text:'¼ 公斤 = ? 公克',  ans:250,  hint:'先把分數換成小數：¼ = 0.25<br>公斤換公克要乘 1000，所以：<br>0.25 × 1000 = <strong>250 公克</strong>'},
-  {cat:'volume', text:'¾ 公升 = ? 毫升',  ans:750,  hint:'先把分數換成小數：¾ = 0.75<br>公升換毫升要乘 1000，所以：<br>0.75 × 1000 = <strong>750 毫升</strong>'},
-  {cat:'length', text:'½ 公尺 = ? 公分',  ans:50,   hint:'先把分數換成小數：½ = 0.5<br>公尺換公分要乘 100，所以：<br>0.5 × 100 = <strong>50 公分</strong>'},
-  {cat:'weight', text:'⅕ 公斤 = ? 公克',  ans:200,  hint:'先把分數換成小數：⅕ = 0.2<br>公斤換公克要乘 1000，所以：<br>0.2 × 1000 = <strong>200 公克</strong>'},
-  {cat:'volume', text:'⅖ 公升 = ? 毫升',  ans:400,  hint:'先把分數換成小數：⅖ = 0.4<br>公升換毫升要乘 1000，所以：<br>0.4 × 1000 = <strong>400 毫升</strong>'},
-  {cat:'length', text:'¼ 公里 = ? 公尺',  ans:250,  hint:'先把分數換成小數：¼ = 0.25<br>公里換公尺要乘 1000，所以：<br>0.25 × 1000 = <strong>250 公尺</strong>'},
-  {cat:'time',   text:'½ 小時 = ? 分鐘',  ans:30,   hint:'先把分數換成小數：½ = 0.5<br>小時換分鐘要乘 60，所以：<br>0.5 × 60 = <strong>30 分鐘</strong>'},
-  {cat:'time',   text:'¼ 小時 = ? 分鐘',  ans:15,   hint:'先把分數換成小數：¼ = 0.25<br>小時換分鐘要乘 60，所以：<br>0.25 × 60 = <strong>15 分鐘</strong>'},
-  {cat:'area',   text:'½ 平方公尺 = ? 平方公分', ans:5000, hint:'先把分數換成小數：½ = 0.5<br>平方公尺換平方公分要乘 10000，所以：<br>0.5 × 10000 = <strong>5000 平方公分</strong>'},
-  {cat:'vol3d',  text:'½ 公升 = ? 立方公分',     ans:500,  hint:'先把分數換成小數：½ = 0.5<br>1 公升 = 1000cm³，所以：<br>0.5 × 1000 = <strong>500 立方公分</strong>'},
+const IMPROPER = [
+  { n:3,  d:2,  dec:1.5,  sym:'3/2'   },
+  { n:5,  d:4,  dec:1.25, sym:'5/4'   },
+  { n:7,  d:4,  dec:1.75, sym:'7/4'   },
+  { n:9,  d:4,  dec:2.25, sym:'9/4'   },
+  { n:11, d:4,  dec:2.75, sym:'11/4'  },
+  { n:6,  d:5,  dec:1.2,  sym:'6/5'   },
+  { n:7,  d:5,  dec:1.4,  sym:'7/5'   },
+  { n:8,  d:5,  dec:1.6,  sym:'8/5'   },
+  { n:9,  d:5,  dec:1.8,  sym:'9/5'   },
+  { n:11, d:10, dec:1.1,  sym:'11/10' },
+  { n:13, d:10, dec:1.3,  sym:'13/10' },
+  { n:17, d:10, dec:1.7,  sym:'17/10' },
 ];
 
-const catLabel = {length:'長度', weight:'重量', volume:'容量', area:'面積', time:'時間', perim:'周長', vol3d:'體積'};
+const MIXED_FRAC = [
+  { sym:'½', dec:0.5  },
+  { sym:'¼', dec:0.25 },
+  { sym:'¾', dec:0.75 },
+  { sym:'⅕', dec:0.2  },
+  { sym:'⅖', dec:0.4  },
+  { sym:'⅗', dec:0.6  },
+  { sym:'⅘', dec:0.8  },
+];
+
+function genFracQ() {
+  const types = fracType === 'all'
+    ? ['frac2dec','dec2frac','mixed','improper']
+    : [fracType];
+  const t = rFrom(types);
+
+  // ── 真分數 → 小數 ──
+  if (t === 'frac2dec') {
+    const f = rFrom(FRACS);
+    return {
+      question:    `${f.sym} = ?`,
+      ansHint:     '✏️ 填入小數（例如：0.5）',
+      placeholder: '填入小數',
+      ans:  f.dec,
+      hint: `分子 ÷ 分母 = ${f.n} ÷ ${f.d} = <strong>${f.dec}</strong>`,
+    };
+  }
+
+  // ── 小數 → 分子 ──
+  if (t === 'dec2frac') {
+    const f = rFrom(FRACS);
+    return {
+      question:    `${f.dec} = ☐ / ${f.d}`,
+      ansHint:     `✏️ 填入分子（分母是 ${f.d}）`,
+      placeholder: '填入分子',
+      ans:  f.n,
+      hint: `${f.dec} × ${f.d} = <strong>${f.n}</strong>，所以 ${f.dec} = ${f.n}/${f.d}`,
+    };
+  }
+
+  // ── 帶分數 ──
+  if (t === 'mixed') {
+    const whole = rFrom([1,2,3]);
+    const frac  = rFrom(MIXED_FRAC);
+    const dec   = parseFloat((whole + frac.dec).toFixed(4));
+    const dir   = Math.random() < 0.5 ? 'to_dec' : 'to_whole';
+    if (dir === 'to_dec') {
+      return {
+        question:    `${whole}${frac.sym} = ?`,
+        ansHint:     '✏️ 填入小數（整數 + 分數部分相加）',
+        placeholder: '填入小數',
+        ans:  dec,
+        hint: `${whole} + ${frac.sym}（= ${frac.dec}）= <strong>${dec}</strong>`,
+      };
+    } else {
+      return {
+        question:    `${dec} 的整數部分是？`,
+        ansHint:     `✏️ 填整數（${dec} = ? + ${frac.dec}）`,
+        placeholder: '填整數部分',
+        ans:  whole,
+        hint: `${dec} = ${whole} + ${frac.dec}，整數部分是 <strong>${whole}</strong>`,
+      };
+    }
+  }
+
+  // ── 假分數 ──
+  if (t === 'improper') {
+    const f   = rFrom(IMPROPER);
+    const dir = Math.random() < 0.5 ? 'to_dec' : 'to_n';
+    if (dir === 'to_dec') {
+      return {
+        question:    `${f.sym} = ?`,
+        ansHint:     '✏️ 填入小數',
+        placeholder: '填入小數',
+        ans:  f.dec,
+        hint: `${f.n} ÷ ${f.d} = <strong>${f.dec}</strong>`,
+      };
+    } else {
+      return {
+        question:    `${f.dec} = ☐ / ${f.d}`,
+        ansHint:     `✏️ 填入分子（分母是 ${f.d}，分子會比 ${f.d} 大）`,
+        placeholder: '填入分子',
+        ans:  f.n,
+        hint: `${f.dec} × ${f.d} = <strong>${f.n}</strong>，所以 ${f.dec} = ${f.n}/${f.d}`,
+      };
+    }
+  }
+}
+
+const typeLabelMap = {
+  frac2dec: '分數 → 小數',
+  dec2frac: '小數 → 分數',
+  mixed:    '帶分數',
+  improper: '假分數',
+};
+
+let curFracQ = null;
+
+function loadFrac() {
+  curFracQ = genFracQ();
+  S.fracDone = false;
+  document.getElementById('fracText').textContent = curFracQ.question;
+  const hintEl = document.getElementById('fracAnsHint');
+  hintEl.textContent = curFracQ.ansHint;
+  hintEl.className = 'frac-ans-hint show';
+  const inp = document.getElementById('fracAnsInput');
+  inp.value = ''; inp.className = 'ans-input'; inp.disabled = false; inp.style.borderColor = '';
+  inp.placeholder = curFracQ.placeholder || '填入答案';
+  document.getElementById('fracFb').className = 'feedback';
+  document.getElementById('fracNext').classList.remove('show');
+}
+
+function selectFracType(type, btn) {
+  fracType = type;
+  document.querySelectorAll('#tab-fraction .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadFrac();
+}
+
+function checkFrac() {
+  if (S.fracDone) return;
+  const inp = document.getElementById('fracAnsInput');
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) return;
+  S.fracDone = true; inp.disabled = true; S.totalAnswered++;
+
+  const ok = Math.abs(val - curFracQ.ans) < 0.0001;
+  const fb = document.getElementById('fracFb');
+  if (ok) {
+    inp.className = 'ans-input correct';
+    fb.className = 'feedback correct';
+    fb.innerHTML = randFrom(praiseMsg);
+    S.correct++; S.streak++;
+  } else {
+    inp.className = 'ans-input wrong';
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `<div style="margin-bottom:8px">${randFrom(wrongMsg)}</div><div class="hint-block">正確答案是 <strong>${curFracQ.ans}</strong><br><br>${curFracQ.hint}</div>`;
+    S.streak = 0;
+  }
+  updateScoreUI();
+  document.getElementById('fracNext').classList.add('show');
+}
+
+function nextFrac() { loadFrac(); }
+
+const catLabel = {length:'長度', weight:'重量', volume:'容量', area:'面積', time:'時間', perim:'周長', fracapp:'分數應用', vol3d:'體積'};
 
 const praiseMsg = [
   '太棒了！你算得很準確 😊',
@@ -778,21 +1555,29 @@ function pools() {
   };
 }
 
+function setLevelBadge(id, level) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (level === 'basic')    { el.textContent = '基礎題'; el.className = 'q-level-badge basic'; }
+  else if (level === 'advanced') { el.textContent = '⭐ 進階題'; el.className = 'q-level-badge advanced'; }
+  else { el.className = 'q-level-badge'; }
+}
+
 function loadPair() {
-  const p = pools();
-  S.curA = p.unit[Math.floor(Math.random() * p.unit.length)];
-  S.curB = p.life.length > 0
-    ? p.life[Math.floor(Math.random() * p.life.length)]
-    : p.unit[Math.floor(Math.random() * p.unit.length)];
+  S.curA = genQ(S.cat, 'unit');
+  S.curB = genQ(S.cat, 'life');
   S.doneA = false;
   S.doneB = false;
 
   document.getElementById('qTagA').textContent = catLabel[S.curA.cat];
   document.getElementById('qTagA').className = 'q-tag ' + S.curA.cat;
   document.getElementById('qTextA').textContent = S.curA.text;
+  setLevelBadge('qLevelA', S.curA.level);
+
   document.getElementById('qTagB').textContent = catLabel[S.curB.cat];
   document.getElementById('qTagB').className = 'q-tag ' + S.curB.cat;
   document.getElementById('qTextB').textContent = S.curB.text;
+  setLevelBadge('qLevelB', S.curB.level);
 
   ['ansA','ansB'].forEach(id => {
     const el = document.getElementById(id);
@@ -826,19 +1611,7 @@ function updateScoreUI() {
 }
 
 function checkMilestone() {
-  if (!S.milestoneShown && S.totalAnswered >= 20) {
-    S.milestoneShown = true;
-    const pct = Math.round(S.correct / S.totalAnswered * 100);
-    document.getElementById('mPct').textContent = pct + '%';
-    document.getElementById('mMsg').textContent =
-      `今天的正確率是 ${pct}%！你已經努力答了 20 題，真的很棒！繼續加油，你越來越厲害了 💪`;
-    document.getElementById('milestoneOverlay').classList.add('show');
-  }
-}
-
-function closeMilestone() {
-  document.getElementById('milestoneOverlay').classList.remove('show');
-  S.milestoneShown = false;
+  // 整合進 updateScoreUI，保留空函式
 }
 
 function checkSingle(which) {
@@ -895,44 +1668,48 @@ function selectCat(cat, btn) {
 
 function showResult() {
   const pct = Math.round(S.correct / TOTAL_Q * 100);
-  document.getElementById('rScore').textContent = S.correct + ' / ' + TOTAL_Q;
-  document.getElementById('rPct').textContent = '正確率 ' + pct + '%';
+  document.getElementById('rPct').textContent = pct + '%';
+  document.getElementById('rScore').textContent = S.correct + ' / ' + TOTAL_Q + ' 題答對';
 
   let icon, title, msg;
   if (pct === 100) {
     icon  = '🌟';
     title = '尼卡模式・五檔解放！';
-    msg   = '「橡皮惡魔果實，覺醒！」你已經開啟五檔，尼卡模式全開！這次的賞金直接破天，世界政府已經把你列為最高威脅。繼續下去，你就是新時代的海賊王！';
+    msg   = '「橡皮惡魔果實，覺醒！」五檔全開，尼卡模式啟動！賞金直接破天，世界政府已將你列為最高威脅。索隆說：「你已經是能成為海賊王的男人了！」';
   } else if (pct >= 80) {
     icon  = '👑';
     title = '四檔・霸王色纏繞！';
-    msg   = '四檔解放，霸王色覆蓋全身！這種霸氣，一般海賊光是對視就昏倒了。再把剩下幾題練熟，五檔就在眼前。';
+    msg   = '四檔解放，霸王色覆蓋全身！這種霸氣，一般海賊光是對視就會昏倒。索隆還是想嗆你——把剩下幾題練熟！';
   } else if (pct >= 60) {
     icon  = '💪';
     title = '武裝色・鋼鐵意志！';
-    msg   = '武裝色全身覆蓋，你的答題變得像黑鋼一樣堅硬。還有幾題出了漏洞，但沒關係——每一次答錯都是在鍛鍊霸氣，繼續！';
+    msg   = '答題已如武裝色般堅硬，還是錯了幾題。香吉士用男子漢的方式說：「失敗只會讓你變得更強。」每一次答錯都是在鍛鍊霸氣！';
   } else if (pct >= 40) {
     icon  = '⚠️';
-    title = '兩檔・找冥王去修煉！';
-    msg   = '這次只開到兩檔，發力還不夠穩。冥王雷利說過：沒有基礎，霸氣只是空談。再不修煉好，下次碰到黃猿，你連逃都逃不掉！';
+    title = '二檔・找冥王去修煉！';
+    msg   = '基礎不夠穩，魯夫說快逃，我們太弱了，去找冥王雷利鍛鍊，不然會死在黃猿手裡！！！';
   } else if (pct >= 20) {
     icon  = '😓';
     title = '一檔・繼續撐住！';
-    msg   = '一檔啟動，但力量還不夠。魯夫當年在和之國也輸了很多次，每輸一次就更強一次——你還有機會！';
+    msg   = '索隆說：「要是連這種程度都撐不住，還談什麼夢想！」每輸一次就更強一次——再來！';
   } else if (pct >= 1) {
     icon  = '😅';
-    title = '齒輪都還沒熱起來⋯';
-    msg   = '連一檔都還在暖機⋯不過別忘了，魯夫當初連游泳都不會。回去看換算梯，把基礎打好，再來挑戰！';
+    title = '打怪太少了，多練練一定會升級';
+    msg   = '魯夫剛出海遇到巴奇也輸很慘。香吉士笑著說：「不准說喪氣的話，給我站起來。」多打幾回合，就能晉級！';
   } else {
     icon  = '🏴‍☠️';
-    title = '去修練吧！';
-    msg   = '這次一題都沒答對，但這只是起點。香吉士說過：「就算跌倒，也要用腳站起來。」先去換算梯看看，回來我們重新開始！';
+    title = '回去修煉吧！';
+    msg   = '一題都沒答對。香吉士說：「跌倒，就站起來。」索隆補充：「不先學會揮刀，怎麼斬開大海？」先去看看觀念，我們再來戰鬥！';
   }
 
   document.getElementById('rIcon').textContent  = icon;
   document.getElementById('rTitle').textContent = title;
   document.getElementById('rMsg').textContent   = msg;
   document.getElementById('overlay').classList.add('show');
+}
+
+function checkMilestone() {
+  // 里程碑整合進 updateScoreUI，這裡保留空函式避免報錯
 }
 
 function restartQuiz() {
@@ -943,45 +1720,6 @@ function restartQuiz() {
   document.getElementById('overlay').classList.remove('show');
   loadPair();
 }
-
-// ── Fraction ──
-let fi = 0;
-const fShuf = [...FQs].sort(() => Math.random() - 0.5);
-
-function loadFrac() {
-  const q = fShuf[fi % fShuf.length];
-  S.fracQ = q; S.fracDone = false;
-  document.getElementById('fracMeta').textContent = catLabel[q.cat];
-  document.getElementById('fracText').textContent = q.text;
-  const inp = document.getElementById('fracAnsInput');
-  inp.value = ''; inp.style.borderColor = ''; inp.disabled = false;
-  document.getElementById('fracFb').className = 'feedback';
-  document.getElementById('fracNext').classList.remove('show');
-}
-
-function checkFrac() {
-  if (S.fracDone) return;
-  const inp = document.getElementById('fracAnsInput');
-  const val = parseFloat(inp.value);
-  if (isNaN(val)) return;
-  S.fracDone = true; inp.disabled = true; S.totalAnswered++;
-  const ok = Math.abs(val - S.fracQ.ans) < 0.01;
-  const fb = document.getElementById('fracFb');
-  if (ok) {
-    fb.className = 'feedback correct';
-    fb.innerHTML = randFrom(praiseMsg);
-    S.correct++; S.streak++;
-  } else {
-    fb.className = 'feedback wrong';
-    fb.innerHTML = `<div style="margin-bottom:8px">${randFrom(wrongMsg)}</div><div class="hint-block">正確答案是 <strong>${S.fracQ.ans}</strong><br><br>${S.fracQ.hint}</div>`;
-    S.streak = 0;
-  }
-  updateScoreUI();
-  document.getElementById('fracNext').classList.add('show');
-  checkMilestone();
-}
-
-function nextFrac() { fi++; loadFrac(); }
 
 // ── Decimal ──
 function calcShift() {
