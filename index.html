@@ -1758,7 +1758,7 @@ function getStudentName() {
   } catch(e) {}
   let name = '';
   while (!name || name.trim() === '') {
-    name = prompt('請輸入小孩的名字 👦') || '';
+    name = prompt('歡迎來偉大的航道，挑戰更高的懸賞金💰\n\n請寫下你的大名，挑戰成為海賊王') || '';
   }
   name = name.trim();
   localStorage.setItem('studentInfo', JSON.stringify({ name, time: Date.now() }));
