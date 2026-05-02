@@ -97,7 +97,9 @@
   .prog-row { display:flex; justify-content:space-between; font-size:12px; color:var(--text-light); margin-bottom:8px; }
   .prog-bar { height:4px; background:var(--border); border-radius:99px; overflow:hidden; margin-bottom:16px; }
   .prog-fill { height:100%; background:var(--accent); border-radius:99px; transition:width .35s ease; }
-  .pair-label { font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px; letter-spacing:.3px; }
+  .global-prog-inner { max-width:720px; margin:12px auto 0; padding:0 4px; }
+  .global-prog-row { display:flex; justify-content:space-between; font-size:13px; color:var(--text-mid); margin-bottom:6px; }
+  .global-prog-row strong { color:var(--accent); }
   .q-top-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
   .q-tag { display:inline-block; font-size:12px; font-weight:700; padding:4px 8px; border-radius:4px; }
   .q-type-badge { display:inline-block; font-size:11px; font-weight:700; padding:4px 8px; border-radius:4px; background:#f0f0ee; color:var(--text-light); }
@@ -232,10 +234,14 @@
       <div class="header-title">單位換算練習</div>
       <div class="header-sub">小學四年級・長度・重量・容量・時間・面積・體積</div>
     </div>
-    <div class="score-row">
-      <div class="score-chip">今日答對 <span id="correctCount">0</span> 題</div>
-      <div class="score-chip">連續 <span id="streakCount">0</span> 題</div>
+  </div>
+  <!-- 全域進度列 -->
+  <div class="global-prog-inner">
+    <div class="global-prog-row">
+      <span>答對 <strong><span id="correctCount">0</span></strong> 題</span>
+      <span>已答 <span id="totalAnsweredDisplay">0</span> / <span id="globalTotal">20</span> 題</span>
     </div>
+    <div class="prog-bar"><div class="prog-fill" id="globalProgFill" style="width:0%"></div></div>
   </div>
 </header>
 
@@ -468,12 +474,6 @@
       <button class="cat-btn" onclick="selectCat('vol3d',this)">體積</button>
     </div>
 
-    <div class="prog-row">
-      <span>第 <span id="qNum">1</span> 回</span>
-      <span>答對 <span id="progCorrect">0</span> ／ 已答 <span id="qAnswered">0</span> ／ <span id="qTotal">50</span> 題</span>
-    </div>
-    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-
     <!-- 第1題：換算題 -->
     <div class="pair-label">第 1 題　換算題</div>
     <div class="q-card">
@@ -610,7 +610,7 @@ const S = {
   cat:'all',
   curA:null, curB:null, doneA:false, doneB:false,
   fracQ:null, fracDone:false,
-  milestoneShown:false
+  milestoneShown:false, roundDone:false
 };
 
 // ── Question bank ──
@@ -737,7 +737,38 @@ function switchTab(name, btn) {
 }
 
 // ── Quiz (pair mode, independent confirm) ──
-const TOTAL_Q = 50; // 每回合總題數
+const TOTAL_Q = 20; // 每回合總題數（10回 × 2題）
+
+// ── Cookie 工具 ──
+function setCookie(name, value, days) {
+  const exp = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};expires=${exp};path=/`;
+}
+function getCookie(name) {
+  const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+  if (!m) return null;
+  try { return JSON.parse(decodeURIComponent(m[1])); } catch { return null; }
+}
+
+// ── 讀取／寫入答題紀錄 ──
+function loadRecord() {
+  const rec = getCookie('unitRecord');
+  if (!rec) return;
+  // 超過7天未回來 → 歸0（lastVisit 超過7天）
+  const daysSince = (Date.now() - rec.lastVisit) / 864e5;
+  if (daysSince > 7) return; // 直接忽略，等於歸0
+  S.correct       = rec.correct       || 0;
+  S.totalAnswered = rec.totalAnswered  || 0;
+  updateScoreUI();
+  updateProg();
+}
+function saveRecord() {
+  setCookie('unitRecord', {
+    correct:       S.correct,
+    totalAnswered: S.totalAnswered,
+    lastVisit:     Date.now(),
+  }, 7);
+}
 
 function pools() {
   const all = S.cat === 'all' ? Qs : Qs.filter(q => q.cat === S.cat);
@@ -777,18 +808,21 @@ function loadPair() {
 }
 
 function updateProg() {
-  const pct = (S.totalAnswered / TOTAL_Q * 100);
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('qNum').textContent = S.pairCount + 1;
-  document.getElementById('qAnswered').textContent = S.totalAnswered;
-  document.getElementById('qTotal').textContent = TOTAL_Q;
+  // 已改為全域進度列，這裡只更新全域即可
+  updateScoreUI();
 }
 
 function updateScoreUI() {
   document.getElementById('correctCount').textContent = S.correct;
-  document.getElementById('streakCount').textContent = S.streak;
-  const pc = document.getElementById('progCorrect');
-  if (pc) pc.textContent = S.correct;
+  document.getElementById('totalAnsweredDisplay').textContent = S.totalAnswered;
+  const pct = Math.min(S.totalAnswered / TOTAL_Q * 100, 100);
+  document.getElementById('globalProgFill').style.width = pct + '%';
+  // 觸發里程碑與結束
+  if (S.totalAnswered >= TOTAL_Q && !S.roundDone) {
+    S.roundDone = true;
+    setTimeout(showResult, 800);
+  }
+  saveRecord();
 }
 
 function checkMilestone() {
@@ -903,7 +937,8 @@ function showResult() {
 
 function restartQuiz() {
   S.correct = 0; S.streak = 0;
-  S.totalAnswered = 0; S.pairCount = 0;
+  S.totalAnswered = 0; S.pairCount = 0; S.roundDone = false;
+  saveRecord();
   updateScoreUI();
   document.getElementById('overlay').classList.remove('show');
   loadPair();
@@ -957,7 +992,7 @@ function calcShift() {
   document.getElementById('shiftResult').innerHTML = `${n} ${label} = <span class="hi">${+res.toFixed(8)}</span>`;
 }
 
-loadPair(); loadFrac(); calcShift();
+loadRecord(); loadPair(); loadFrac(); calcShift();
 </script>
 </body>
 </html>
