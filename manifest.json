@@ -1,6 +1,6 @@
 {
-  "name": "航海王數學道場",
-  "short_name": "數學道場",
+  "name": "Luffy Math Practice",
+  "short_name": "Luffy Math",
   "description": "小四單位換算練習，跟著魯夫一起升級！",
   "start_url": "./index.html",
   "display": "standalone",
