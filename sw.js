@@ -1,4 +1,4 @@
-const CACHE = 'math-dojo-v1';
+const CACHE = 'math-dojo-v2';
 const ASSETS = [
   './',
   './index.html',
