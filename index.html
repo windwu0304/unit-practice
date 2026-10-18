@@ -250,6 +250,71 @@
     .shift-wrap input { width:120px; }
     .shift-result { font-size:24px; padding:20px; }
   }
+
+  /* ── Subject / Grade navigation ── */
+  .subject-bar {
+    background: #1a1a2e;
+    padding: 8px 0 0;
+  }
+  .subject-inner {
+    display: flex;
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 4px;
+    padding: 0 12px;
+  }
+  .subject-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    background: #2a2a4e;
+    color: #888;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .subject-btn.active {
+    background: #e63946;
+    color: #fff;
+  }
+  .grade-bar {
+    background: #16213e;
+    padding: 6px 0;
+    border-bottom: 2px solid #0f3460;
+  }
+  .grade-inner {
+    display: flex;
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 6px;
+    padding: 0 12px;
+  }
+  .grade-btn {
+    flex: 1;
+    padding: 7px;
+    border: 2px solid #0f3460;
+    border-radius: 8px;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .grade-btn.active {
+    background: #0f3460;
+    color: #f5c518;
+    border-color: #f5c518;
+  }
+  .content-section {
+    display: none;
+  }
+  .content-section.active {
+    display: block;
+  }
+
 </style>
 </head>
 <body>
@@ -257,8 +322,7 @@
 <header>
   <div class="header-inner">
     <div>
-      <div class="header-title">魯夫的數學修練之旅</div>
-      <div class="header-sub">小學四年級・長度・重量・容量・時間・面積・體積</div>
+      <div class="header-title">魯夫的學習修練之旅</div>
     </div>
   </div>
   <!-- 全域進度列 -->
@@ -271,6 +335,20 @@
   </div>
 </header>
 
+<div class="subject-bar">
+  <div class="subject-inner">
+    <button class="subject-btn active" data-subject="math" onclick="switchSubject('math',this)">數學</button>
+    <button class="subject-btn" data-subject="english" onclick="switchSubject('english',this)">英文</button>
+  </div>
+</div>
+<div class="grade-bar">
+  <div class="grade-inner">
+    <button class="grade-btn active" data-grade="middle" onclick="switchGrade('middle',this)">中年級</button>
+    <button class="grade-btn" data-grade="high" onclick="switchGrade('high',this)">高年級</button>
+  </div>
+</div>
+
+<div class="content-section active" id="section-math-middle">
 <div class="tab-bar">
   <div class="tab-inner">
     <button class="tab-btn active" onclick="switchTab('quiz',this)">練習題</button>
@@ -645,6 +723,378 @@
     <button class="btn-primary" style="width:100%" onclick="restartQuiz()">再練一次 🔄</button>
   </div>
 </div>
+
+</div><!-- /section-math-middle -->
+
+
+<div class="content-section" id="section-math-high">
+  <div class="tab-bar">
+    <div class="tab-inner">
+      <button class="tab-btn active" onclick="switchMathHighTab('math-high-ref',this)">重點整理</button>
+      <button class="tab-btn" onclick="switchMathHighTab('math-high-quiz',this)">練習題</button>
+    </div>
+  </div>
+
+  <!-- Reference Tab -->
+  <div class="section active" id="tab-math-high-ref">
+
+    <div class="card" style="margin:16px auto; max-width:600px; padding:20px;">
+      <h2 style="color:#f5c518; font-size:18px; margin-bottom:12px;">第一單元：因數是什麼？</h2>
+      <p style="color:#ccc; font-size:14px; line-height:1.7; margin-bottom:12px;">因數就是：一個數可以被哪些數<strong style="color:#fff">整除，而且沒有餘數</strong>。</p>
+
+      <div style="background:#1a3060; border-radius:10px; padding:14px; margin-bottom:12px;">
+        <div style="color:#f5c518; font-weight:700; margin-bottom:8px; font-size:14px;">例：12 的因數有哪些？</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; font-size:13px;">
+          <div style="background:#0f2040; padding:8px; border-radius:8px; text-align:center; color:#a5d6a7;">12÷1=12 ✓</div>
+          <div style="background:#0f2040; padding:8px; border-radius:8px; text-align:center; color:#a5d6a7;">12÷2=6 ✓</div>
+          <div style="background:#0f2040; padding:8px; border-radius:8px; text-align:center; color:#a5d6a7;">12÷3=4 ✓</div>
+          <div style="background:#0f2040; padding:8px; border-radius:8px; text-align:center; color:#a5d6a7;">12÷4=3 ✓</div>
+          <div style="background:#3a1010; padding:8px; border-radius:8px; text-align:center; color:#ef9a9a;">12÷5=2…2 ✗</div>
+          <div style="background:#0f2040; padding:8px; border-radius:8px; text-align:center; color:#a5d6a7;">12÷6=2 ✓</div>
+        </div>
+        <div style="margin-top:10px; color:#fff; font-size:14px; text-align:center;">
+          ∴ 12 的因數：<strong style="color:#f5c518;">1、2、3、4、6、12</strong>
+        </div>
+      </div>
+
+      <div style="background:#1e2a1e; border-radius:10px; padding:14px; margin-bottom:12px;">
+        <div style="color:#a5d6a7; font-weight:700; margin-bottom:8px; font-size:14px;">✦ 成對找因數技巧</div>
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <tr style="background:#0f3460;">
+            <th style="padding:7px; color:#f5c518; text-align:center;">乘法算式</th>
+            <th style="padding:7px; color:#f5c518; text-align:center;">因數配對</th>
+          </tr>
+          <tr><td style="padding:7px; color:#fff; text-align:center;">1 × 12 = 12</td><td style="padding:7px; color:#4fc3f7; text-align:center; font-weight:700;">1、12</td></tr>
+          <tr style="background:#111a2e;"><td style="padding:7px; color:#fff; text-align:center;">2 × 6 = 12</td><td style="padding:7px; color:#4fc3f7; text-align:center; font-weight:700;">2、6</td></tr>
+          <tr><td style="padding:7px; color:#fff; text-align:center;">3 × 4 = 12</td><td style="padding:7px; color:#4fc3f7; text-align:center; font-weight:700;">3、4</td></tr>
+        </table>
+      </div>
+
+      <div style="background:#2a1a0e; border-left:4px solid #f5c518; padding:10px 14px; border-radius:0 8px 8px 0; font-size:13px; color:#ffd180;">
+        💡 記住：因數一定<strong>不大於原數</strong>，1 和原數本身一定是因數。
+      </div>
+    </div>
+
+    <div class="card" style="margin:0 auto 16px; max-width:600px; padding:20px;">
+      <h2 style="color:#f5c518; font-size:18px; margin-bottom:12px;">第二單元：倍數是什麼？</h2>
+      <p style="color:#ccc; font-size:14px; line-height:1.7; margin-bottom:12px;">倍數就是：一個數<strong style="color:#fff">乘以 1、2、3、4……</strong> 得到的數。</p>
+
+      <div style="display:flex; gap:8px; justify-content:center; margin-bottom:14px; flex-wrap:wrap;">
+        <div style="background:#1a3060; border-radius:12px; padding:12px 18px; text-align:center; min-width:60px;">
+          <div style="font-size:22px; font-weight:700; color:#4fc3f7;">4</div>
+          <div style="font-size:11px; color:#888;">4×1</div>
+        </div>
+        <div style="background:#1a3060; border-radius:12px; padding:12px 18px; text-align:center; min-width:60px;">
+          <div style="font-size:22px; font-weight:700; color:#4fc3f7;">8</div>
+          <div style="font-size:11px; color:#888;">4×2</div>
+        </div>
+        <div style="background:#1a3060; border-radius:12px; padding:12px 18px; text-align:center; min-width:60px;">
+          <div style="font-size:22px; font-weight:700; color:#4fc3f7;">12</div>
+          <div style="font-size:11px; color:#888;">4×3</div>
+        </div>
+        <div style="background:#1a3060; border-radius:12px; padding:12px 18px; text-align:center; min-width:60px;">
+          <div style="font-size:22px; font-weight:700; color:#4fc3f7;">16</div>
+          <div style="font-size:11px; color:#888;">4×4</div>
+        </div>
+        <div style="background:#162030; border-radius:12px; padding:12px 18px; text-align:center; min-width:60px;">
+          <div style="font-size:22px; font-weight:700; color:#555;">…</div>
+          <div style="font-size:11px; color:#555;">無限</div>
+        </div>
+      </div>
+
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:12px;">
+        <tr style="background:#0f3460;">
+          <th style="padding:8px; color:#f5c518; text-align:left;">比較</th>
+          <th style="padding:8px; color:#f5c518; text-align:center;">因數</th>
+          <th style="padding:8px; color:#f5c518; text-align:center;">倍數</th>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px; color:#aaa; background:#1a2030;">怎麼找？</td>
+          <td style="padding:7px 8px; color:#fff; text-align:center; background:#1a2030;">除法，找整除的數</td>
+          <td style="padding:7px 8px; color:#fff; text-align:center; background:#1a2030;">乘法，乘1、2、3…</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px; color:#aaa; background:#16182a;">數字大小</td>
+          <td style="padding:7px 8px; color:#fff; text-align:center; background:#16182a;">不大於原數</td>
+          <td style="padding:7px 8px; color:#fff; text-align:center; background:#16182a;">不小於原數</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px; color:#aaa; background:#1a2030;">例（12）</td>
+          <td style="padding:7px 8px; color:#4fc3f7; text-align:center; background:#1a2030;">1,2,3,4,6,12</td>
+          <td style="padding:7px 8px; color:#4fc3f7; text-align:center; background:#1a2030;">12,24,36,48…</td>
+        </tr>
+      </table>
+
+      <div style="background:#2a1a0e; border-left:4px solid #f5c518; padding:10px 14px; border-radius:0 8px 8px 0; font-size:13px; color:#ffd180;">
+        💡 口訣：因數用<strong>除法</strong>找，倍數用<strong>乘法</strong>找。
+      </div>
+    </div>
+
+    <div class="card" style="margin:0 auto 16px; max-width:600px; padding:20px;">
+      <h2 style="color:#f5c518; font-size:18px; margin-bottom:12px;">第三單元：公因數 &amp; 最大公因數</h2>
+      <p style="color:#ccc; font-size:14px; margin-bottom:12px;">「公」= 共同的。找出兩個數因數裡<strong style="color:#fff">相同的部分</strong>。</p>
+
+      <div style="background:#1a3060; border-radius:10px; padding:14px; margin-bottom:12px;">
+        <div style="color:#f5c518; font-weight:700; margin-bottom:10px; font-size:14px;">例：12 和 18 的公因數？</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:130px;">
+            <div style="color:#4fc3f7; font-size:13px; font-weight:700; margin-bottom:6px;">12 的因數</div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">1</span>
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">2</span>
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">3</span>
+              <span style="background:#0f2040; color:#fff; padding:4px 8px; border-radius:6px; font-size:13px;">4</span>
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">6</span>
+              <span style="background:#0f2040; color:#fff; padding:4px 8px; border-radius:6px; font-size:13px;">12</span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:130px;">
+            <div style="color:#80cbc4; font-size:13px; font-weight:700; margin-bottom:6px;">18 的因數</div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">1</span>
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">2</span>
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">3</span>
+              <span style="background:#1b5e20; color:#a5d6a7; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700;">6</span>
+              <span style="background:#0f2040; color:#fff; padding:4px 8px; border-radius:6px; font-size:13px;">9</span>
+              <span style="background:#0f2040; color:#fff; padding:4px 8px; border-radius:6px; font-size:13px;">18</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px; text-align:center;">
+          <span style="color:#aaa; font-size:13px;">公因數：</span>
+          <strong style="color:#f5c518; font-size:16px; margin-left:6px;">1、2、3、6</strong>
+          <span style="color:#ef5350; font-size:14px; font-weight:700; margin-left:12px;">最大公因數 = 6</span>
+        </div>
+      </div>
+
+      <div style="background:#2a1a0e; border-left:4px solid #ef5350; padding:10px 14px; border-radius:0 8px 8px 0; font-size:13px; color:#ffcdd2;">
+        🔑 應用場景：<strong>平均分裝、不能剩下</strong> → 找公因數；<strong>最多幾組</strong> → 找最大公因數
+      </div>
+    </div>
+
+    <div class="card" style="margin:0 auto 16px; max-width:600px; padding:20px;">
+      <h2 style="color:#f5c518; font-size:18px; margin-bottom:12px;">第四單元：公倍數 &amp; 最小公倍數</h2>
+      <p style="color:#ccc; font-size:14px; margin-bottom:12px;">找出兩個數倍數裡<strong style="color:#fff">相同的部分</strong>。</p>
+
+      <div style="background:#1a3060; border-radius:10px; padding:14px; margin-bottom:12px;">
+        <div style="color:#f5c518; font-weight:700; margin-bottom:10px; font-size:14px;">例：4 和 6 的公倍數？</div>
+        <div style="margin-bottom:8px;">
+          <span style="color:#4fc3f7; font-size:13px; font-weight:700;">4 的倍數：</span>
+          <span style="color:#fff; font-size:13px;">4、8、</span>
+          <span style="background:#1b5e20; color:#a5d6a7; padding:2px 7px; border-radius:5px; font-size:13px; font-weight:700;">12</span>
+          <span style="color:#fff; font-size:13px;">、16、20、</span>
+          <span style="background:#1b5e20; color:#a5d6a7; padding:2px 7px; border-radius:5px; font-size:13px; font-weight:700;">24</span>
+          <span style="color:#555; font-size:13px;">…</span>
+        </div>
+        <div style="margin-bottom:12px;">
+          <span style="color:#80cbc4; font-size:13px; font-weight:700;">6 的倍數：</span>
+          <span style="color:#fff; font-size:13px;">6、</span>
+          <span style="background:#1b5e20; color:#a5d6a7; padding:2px 7px; border-radius:5px; font-size:13px; font-weight:700;">12</span>
+          <span style="color:#fff; font-size:13px;">、18、</span>
+          <span style="background:#1b5e20; color:#a5d6a7; padding:2px 7px; border-radius:5px; font-size:13px; font-weight:700;">24</span>
+          <span style="color:#555; font-size:13px;">…</span>
+        </div>
+        <div style="text-align:center;">
+          <span style="color:#aaa; font-size:13px;">公倍數：</span>
+          <strong style="color:#f5c518; font-size:16px; margin-left:6px;">12、24、36…（無限多個）</strong>
+          <br>
+          <span style="color:#ef5350; font-size:14px; font-weight:700; margin-top:4px; display:block;">最小公倍數 = 12</span>
+        </div>
+      </div>
+
+      <div style="background:#2a1a0e; border-left:4px solid #4fc3f7; padding:10px 14px; border-radius:0 8px 8px 0; font-size:13px; color:#b3e5fc;">
+        🔑 應用場景：<strong>每隔幾天重複、幾分鐘後同時</strong> → 找公倍數；<strong>最早多久後</strong> → 找最小公倍數
+      </div>
+    </div>
+
+    <div class="card" style="margin:0 auto 16px; max-width:600px; padding:20px;">
+      <h2 style="color:#f5c518; font-size:18px; margin-bottom:14px;">考前必背口訣</h2>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="background:#1a2a3a; border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:20px;">➗</span>
+          <div><span style="color:#4fc3f7; font-weight:700;">因數：</span><span style="color:#ccc; font-size:14px;">用除法找，不能有餘數。</span></div>
+        </div>
+        <div style="background:#1a2a3a; border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:20px;">✖️</span>
+          <div><span style="color:#80cbc4; font-weight:700;">倍數：</span><span style="color:#ccc; font-size:14px;">用乘法找，乘 1、2、3……</span></div>
+        </div>
+        <div style="background:#1a2a3a; border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:20px;">🔍</span>
+          <div><span style="color:#a5d6a7; font-weight:700;">公因數：</span><span style="color:#ccc; font-size:14px;">兩邊都有的因數；最大的那個 = 最大公因數。</span></div>
+        </div>
+        <div style="background:#1a2a3a; border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:20px;">🔄</span>
+          <div><span style="color:#ffd180; font-weight:700;">公倍數：</span><span style="color:#ccc; font-size:14px;">兩邊都有的倍數；最小的那個 = 最小公倍數。</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-math-high-ref -->
+
+  <!-- Quiz Tab -->
+  <div class="section" id="tab-math-high-quiz">
+    <div id="quiz-container-math-high" style="max-width:600px; margin:0 auto; padding:16px;"></div>
+  </div>
+
+</div><!-- /section-math-high -->
+
+<div class="content-section" id="section-english-middle">
+  <div style="text-align:center; padding: 60px 20px; color: #888;">
+    <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
+    <div style="font-size: 20px; font-weight: 600; color: #f5c518;">英文 · 中年級</div>
+    <div style="margin-top: 8px; font-size: 14px;">即將推出 — 三四年級英文練習</div>
+  </div>
+</div>
+
+<div class="content-section" id="section-english-high">
+<div class="tab-bar">
+  <div class="tab-inner">
+    <button class="tab-btn active" onclick="switchEngTab('eng-ref',this)">文法總覽</button>
+    <button class="tab-btn" onclick="switchEngTab('eng-quiz',this)">練習題</button>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="section active" id="tab-eng-ref">
+  <div class="card" style="margin:0 0 16px;">
+    <h2 style="color:#1a5f7a; font-size:17px; margin-bottom:14px;">一、This / That / These / Those</h2>
+    <p style="color:var(--text-mid); margin-bottom:12px; font-size:14px;">先記住兩個觀念：<strong>遠近 + 單複數</strong></p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <div style="background:#eef7fb; border:1.5px solid #9ecfe0; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a5f7a;">This</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">這個 ・ 近 ・ 單數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">This is an apple.</div>
+      </div>
+      <div style="background:#eef8f3; border:1.5px solid #9ed4be; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a7f4b;">That</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">那個 ・ 遠 ・ 單數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">That is an apple.</div>
+      </div>
+      <div style="background:#eef7fb; border:1.5px solid #9ecfe0; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a5f7a;">These</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">這些 ・ 近 ・ 複數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">These are apples.</div>
+      </div>
+      <div style="background:#eef8f3; border:1.5px solid #9ed4be; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a7f4b;">Those</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">那些 ・ 遠 ・ 複數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">Those are apples.</div>
+      </div>
+    </div>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:12px; font-size:14px; border:1px solid var(--border);">
+      <tr style="background:#eef7fb;">
+        <th style="padding:8px; text-align:left; border:1px solid var(--border);"></th>
+        <th style="padding:8px; border:1px solid var(--border); color:#1a5f7a;">單數（1 個）</th>
+        <th style="padding:8px; border:1px solid var(--border); color:#1a5f7a;">複數（2 個以上）</th>
+      </tr>
+      <tr>
+        <td style="padding:8px; font-weight:700; color:#1a5f7a; border:1px solid var(--border);">近</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>This</strong> is</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>These</strong> are</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:8px; font-weight:700; color:#1a7f4b; border:1px solid var(--border);">遠</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>That</strong> is</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>Those</strong> are</td>
+      </tr>
+    </table>
+    <div class="info-box">💡 口訣：This / That → 一個，配 is；These / Those → 多個，配 are</div>
+  </div>
+
+  <div class="card" style="margin:0 0 16px;">
+    <h2 style="color:#1a5f7a; font-size:17px; margin-bottom:14px;">二、人稱代名詞搭配總表</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px; border:1px solid var(--border);">
+      <tr style="background:#eef7fb;">
+        <th style="padding:8px 6px; text-align:left; border:1px solid var(--border);">主詞</th>
+        <th style="padding:8px 6px; border:1px solid var(--border); text-align:center; color:#2d6be4;">be 動詞</th>
+        <th style="padding:8px 6px; border:1px solid var(--border); text-align:center; color:#2d6be4;">助動詞</th>
+        <th style="padding:8px 6px; border:1px solid var(--border); text-align:center; color:#2d6be4;">擁有</th>
+      </tr>
+      <tr>
+        <td style="padding:7px 6px; border:1px solid var(--border);">I（我）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">am</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:7px 6px; border:1px solid var(--border);">You（你/你們）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">are</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+      <tr style="background:#fdf3f2;">
+        <td style="padding:7px 6px; border:1px solid var(--border); color:#c0392b;">He（他）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700; color:#c0392b;">is</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">does</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">has</td>
+      </tr>
+      <tr style="background:#fdf3f2;">
+        <td style="padding:7px 6px; border:1px solid var(--border); color:#c0392b;">She（她）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700; color:#c0392b;">is</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">does</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">has</td>
+      </tr>
+      <tr style="background:#fdf3f2;">
+        <td style="padding:7px 6px; border:1px solid var(--border); color:#c0392b;">It（它）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700; color:#c0392b;">is</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">does</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">has</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:7px 6px; border:1px solid var(--border);">We（我們）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">are</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 6px; border:1px solid var(--border);">They（他們）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">are</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+    </table>
+    <div class="info-box" style="margin-top:12px;">
+      🔑 He / She / It → <strong>is / does / has</strong><br>
+      🔑 I / You / We / They → <strong>am 或 are / do / have</strong>
+    </div>
+  </div>
+
+  <div class="card" style="margin:0 0 16px;">
+    <h2 style="color:#1a5f7a; font-size:17px; margin-bottom:14px;">三、特別注意：Does 後動詞變原形！</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px; border:1px solid var(--border);">
+      <tr style="background:#eef7fb;">
+        <th style="padding:8px; border:1px solid var(--border); text-align:center; color:#1a7f4b;">✅ 正確</th>
+        <th style="padding:8px; border:1px solid var(--border); text-align:center; color:#c0392b;">❌ 錯誤</th>
+      </tr>
+      <tr>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic;">Does he <strong>like</strong> apples?</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic; text-decoration:line-through; color:#c0392b;">Does he likes apples?</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic;">Does she <strong>have</strong> a pen?</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic; text-decoration:line-through; color:#c0392b;">Does she has a pen?</td>
+      </tr>
+      <tr>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic;">She doesn't <strong>like</strong> cats.</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic; text-decoration:line-through; color:#c0392b;">She doesn't likes cats.</td>
+      </tr>
+    </table>
+    <div class="info-box" style="margin-top:12px;">💡 does 已帶有第三人稱變化，後面動詞不再加 s！</div>
+  </div>
+</div>
+
+<div class="main">
+<div class="section" id="tab-eng-quiz">
+  <div id="quiz-container-english-high" style="padding:4px 0;">
+    <!-- dynamically rendered by JS -->
+  </div>
+</div>
+</div>
+
+</div><!-- /section-english-high -->
+
+
 
 <script>
 // ── State ──
@@ -1787,6 +2237,167 @@ function sendLineNotify(pct) {
 }
 
 loadRecord(); loadPair(); loadFrac(); calcShift();
+
+// ── Subject / Grade switching ──
+let currentSubject = 'math';
+let currentGrade = 'middle';
+
+function switchSubject(subject, btn) {
+  currentSubject = subject;
+  document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const middleBtn = document.querySelector('.grade-btn[data-grade="middle"]');
+  if (subject === 'english') {
+    middleBtn.style.display = 'none';
+    currentGrade = 'high';
+    document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.grade-btn[data-grade="high"]').classList.add('active');
+  } else {
+    middleBtn.style.display = '';
+  }
+  updateContentSection();
+}
+
+function switchGrade(grade, btn) {
+  currentGrade = grade;
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateContentSection();
+}
+
+function updateContentSection() {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('section-' + currentSubject + '-' + currentGrade);
+  if (target) target.classList.add('active');
+  if (currentSubject === 'english' && currentGrade === 'high') renderQuiz('english-high');
+  if (currentSubject === 'math' && currentGrade === 'high') renderQuiz('math-high');
+}
+
+// ── Unified Quiz Engine ──
+const quizData = {
+  'english-high': {
+    questions: [
+      { q: "_____ is my pencil.（這是我的鉛筆。）", opts: ["This", "These", "Those"], ans: 0, hint: "is → 單數，近的用 This" },
+      { q: "_____ are my books.（這些是我的書。）", opts: ["That", "These", "This"], ans: 1, hint: "are → 複數，近的用 These" },
+      { q: "She _____ a cat.（她有一隻貓。）", opts: ["have", "has", "is"], ans: 1, hint: "She → 第三人稱單數，用 has" },
+      { q: "He _____ happy.（他很開心。）", opts: ["are", "does", "is"], ans: 2, hint: "He → 第三人稱單數，be 動詞用 is" },
+      { q: "_____ you like dogs?（你喜歡狗嗎？）", opts: ["Does", "Are", "Do"], ans: 2, hint: "you → 用 Do" },
+      { q: "_____ she like dogs?（她喜歡狗嗎？）", opts: ["Do", "Does", "Is"], ans: 1, hint: "she → 第三人稱單數，用 Does；後面動詞用原形 like" },
+      { q: "They _____ students.（他們是學生。）", opts: ["is", "am", "are"], ans: 2, hint: "They → be 動詞用 are" },
+      { q: "I _____ my homework every day.（我每天做功課。）", opts: ["does", "do", "am"], ans: 1, hint: "I → 一般動詞用 do；肯定句直接加動詞" }
+    ]
+  },
+  'math-high': {
+    questions: [
+      { q: "24 的因數有哪些？", opts: ["2、4、6、8", "1、2、3、4、6、8、12、24", "24、48、72"], ans: 1, hint: "成對找：1×24, 2×12, 3×8, 4×6 → 因數共 8 個" },
+      { q: "7 的倍數是哪一組？", opts: ["1、7", "7、14、21、28", "7、8、9、10"], ans: 1, hint: "7×1=7, 7×2=14, 7×3=21, 7×4=28" },
+      { q: "8 和 12 的公因數有哪些？", opts: ["1、2、4", "2、4、8", "1、2、3、4、6"], ans: 0, hint: "8的因數：1,2,4,8；12的因數：1,2,3,4,6,12；共同的有：1,2,4" },
+      { q: "3 和 5 的最小公倍數是多少？", opts: ["8", "10", "15"], ans: 2, hint: "3的倍數：3,6,9,12,15…；5的倍數：5,10,15…；最小共同的是 15" },
+      { q: "每 6 天打掃、每 8 天整理，今天同時進行，最早幾天後再次同時？", opts: ["2 天", "14 天", "24 天"], ans: 2, hint: "找 6 和 8 的最小公倍數：6的倍數…6,12,18,24；8的倍數…8,16,24 → 24" },
+      { q: "16 顆餅乾和 24 顆糖果分成最多相同組數且不剩，最多幾組？", opts: ["4 組", "8 組"], ans: 1, hint: "找 16 和 24 的最大公因數：16的因數1,2,4,8,16；24的因數1,2,3,4,6,8,12,24 → 最大公因數 8" }
+    ]
+  }
+};
+
+const quizStates = {};
+
+function getQuizState(id) {
+  if (!quizStates[id]) {
+    quizStates[id] = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+  }
+  return quizStates[id];
+}
+
+function renderQuiz(id) {
+  var container = document.getElementById('quiz-container-' + id);
+  if (!container) return;
+  var data = quizData[id];
+  if (!data) return;
+  var st = getQuizState(id);
+  var total = data.questions.length;
+  if (st.done) {
+    var pct = Math.round(st.correct / total * 100);
+    container.innerHTML = '<div class="card" style="text-align:center;padding:32px 20px;">' +
+      '<div style="font-size:48px;margin-bottom:8px;">' + (pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚') + '</div>' +
+      '<div style="font-size:24px;font-weight:700;color:#f5c518;margin-bottom:8px;">' + st.correct + ' / ' + total + '</div>' +
+      '<div style="color:#aaa;margin-bottom:20px;">' + (pct >= 80 ? '太棒了！全都答對了！' : pct >= 60 ? '不錯喔！再複習一下！' : '先看重點整理，再來練習！') + '</div>' +
+      '<button onclick="resetQuiz(\'' + id + '\')" style="background:#e63946;color:#fff;border:none;padding:12px 32px;border-radius:24px;font-size:16px;cursor:pointer;font-weight:600;">再練一次</button>' +
+      '</div>';
+    return;
+  }
+  var q = data.questions[st.current];
+  var optHtml = q.opts.map(function(opt, i) {
+    var s = 'background:#1e2a3a;color:#fff;border:2px solid #2a3a4a;';
+    if (st.answered) {
+      if (i === q.ans) s = 'background:#1b5e20;color:#a5d6a7;border:2px solid #4caf50;';
+      else if (i === st.wrongIdx) s = 'background:#b71c1c;color:#ffcdd2;border:2px solid #ef5350;';
+      else s = 'background:#1a2030;color:#555;border:2px solid #2a3040;';
+    }
+    return '<button onclick="answerQuiz(\'' + id + '\',' + i + ')" ' + (st.answered ? 'disabled' : '') +
+      ' style="' + s + 'border-radius:12px;padding:14px 16px;font-size:15px;cursor:' + (st.answered ? 'default' : 'pointer') + ';text-align:left;font-weight:600;transition:all 0.2s;width:100%;">' + opt + '</button>';
+  }).join('');
+  var feedbackHtml = '';
+  if (st.answered) {
+    var ok = st.wrongIdx === null;
+    feedbackHtml = '<div style="margin-top:16px;padding:12px;background:' + (ok ? '#1b5e20' : '#b71c1c') + ';border-radius:10px;font-size:14px;color:' + (ok ? '#a5d6a7' : '#ffcdd2') + ';">' +
+      (ok ? '✅ 答對了！' : '❌ 答錯了！正確答案是「' + q.opts[q.ans] + '」') +
+      '<br><span style="color:#ffd180;font-size:13px;margin-top:4px;display:block;">💡 ' + q.hint + '</span></div>' +
+      '<button onclick="nextQuizQ(\'' + id + '\')" style="width:100%;margin-top:12px;background:#0f3460;color:#f5c518;border:none;padding:12px;border-radius:12px;font-size:16px;cursor:pointer;font-weight:600;">' +
+      (st.current < total - 1 ? '下一題 →' : '查看結果') + '</button>';
+  }
+  container.innerHTML = '<div class="card" style="padding:20px;margin-bottom:12px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+    '<span style="color:#888;font-size:13px;">題目 ' + (st.current + 1) + ' / ' + total + '</span>' +
+    '<span style="color:#4fc3f7;font-size:13px;">答對 ' + st.correct + ' 題</span></div>' +
+    '<div style="font-size:16px;color:#fff;line-height:1.6;margin-bottom:20px;font-weight:500;">' + q.q + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;">' + optHtml + '</div>' + feedbackHtml + '</div>' +
+    '<div style="padding:4px 0;"><div style="background:#1a2030;border-radius:8px;height:6px;overflow:hidden;">' +
+    '<div style="background:#4fc3f7;height:100%;width:' + Math.round(st.current / total * 100) + '%;transition:width 0.3s;"></div></div></div>';
+}
+
+function answerQuiz(id, idx) {
+  var st = getQuizState(id);
+  if (st.answered) return;
+  var q = quizData[id].questions[st.current];
+  st.answered = true;
+  if (idx === q.ans) { st.correct++; st.wrongIdx = null; }
+  else { st.wrongIdx = idx; }
+  renderQuiz(id);
+}
+
+function nextQuizQ(id) {
+  var st = getQuizState(id);
+  var total = quizData[id].questions.length;
+  if (st.current < total - 1) {
+    st.current++;
+    st.answered = false;
+    st.wrongIdx = null;
+  } else {
+    st.done = true;
+  }
+  renderQuiz(id);
+}
+
+function resetQuiz(id) {
+  quizStates[id] = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+  renderQuiz(id);
+}
+
+function switchEngTab(name, btn) {
+  document.querySelectorAll('#section-english-high .section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('#section-english-high .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'eng-quiz') renderQuiz('english-high');
+}
+
+function switchMathHighTab(name, btn) {
+  document.querySelectorAll('#section-math-high .section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('#section-math-high .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'math-high-quiz') renderQuiz('math-high');
+}
 </script>
 </body>
 </html>
