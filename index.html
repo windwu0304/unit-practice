@@ -933,7 +933,7 @@
 
   <!-- Quiz Tab -->
   <div class="section" id="tab-math-high-quiz">
-    <div id="math-high-quiz-container" style="max-width:600px; margin:0 auto; padding:16px;"></div>
+    <div id="quiz-container-math-high" style="max-width:600px; margin:0 auto; padding:16px;"></div>
   </div>
 
 </div><!-- /section-math-high -->
@@ -1086,7 +1086,7 @@
 
 <div class="main">
 <div class="section" id="tab-eng-quiz">
-  <div id="eng-quiz-container" style="padding:4px 0;">
+  <div id="quiz-container-english-high" style="padding:4px 0;">
     <!-- dynamically rendered by JS -->
   </div>
 </div>
@@ -2269,97 +2269,118 @@ function updateContentSection() {
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   const target = document.getElementById('section-' + currentSubject + '-' + currentGrade);
   if (target) target.classList.add('active');
-  if (currentSubject === 'english' && currentGrade === 'high') renderEngQuiz();
-  if (currentSubject === 'math' && currentGrade === 'high') renderMathHighQuiz();
+  if (currentSubject === 'english' && currentGrade === 'high') renderQuiz('english-high');
+  if (currentSubject === 'math' && currentGrade === 'high') renderQuiz('math-high');
 }
 
-// ── English quiz ──
-const engQuestions = [
-  { q: "_____ is my pencil.（這是我的鉛筆。）", opts: ["This", "These", "Those"], ans: 0, hint: "is → 單數，近的用 This" },
-  { q: "_____ are my books.（這些是我的書。）", opts: ["That", "These", "This"], ans: 1, hint: "are → 複數，近的用 These" },
-  { q: "She _____ a cat.（她有一隻貓。）", opts: ["have", "has", "is"], ans: 1, hint: "She → 第三人稱單數，用 has" },
-  { q: "He _____ happy.（他很開心。）", opts: ["are", "does", "is"], ans: 2, hint: "He → 第三人稱單數，be 動詞用 is" },
-  { q: "_____ you like dogs?（你喜歡狗嗎？）", opts: ["Does", "Are", "Do"], ans: 2, hint: "you → 用 Do" },
-  { q: "_____ she like dogs?（她喜歡狗嗎？）", opts: ["Do", "Does", "Is"], ans: 1, hint: "she → 第三人稱單數，用 Does；後面動詞用原形 like" },
-  { q: "They _____ students.（他們是學生。）", opts: ["is", "am", "are"], ans: 2, hint: "They → be 動詞用 are" },
-  { q: "I _____ my homework every day.（我每天做功課。）", opts: ["does", "do", "am"], ans: 1, hint: "I → 一般動詞用 do；肯定句直接加動詞" }
-];
+// ── Unified Quiz Engine ──
+const quizData = {
+  'english-high': {
+    questions: [
+      { q: "_____ is my pencil.（這是我的鉛筆。）", opts: ["This", "These", "Those"], ans: 0, hint: "is → 單數，近的用 This" },
+      { q: "_____ are my books.（這些是我的書。）", opts: ["That", "These", "This"], ans: 1, hint: "are → 複數，近的用 These" },
+      { q: "She _____ a cat.（她有一隻貓。）", opts: ["have", "has", "is"], ans: 1, hint: "She → 第三人稱單數，用 has" },
+      { q: "He _____ happy.（他很開心。）", opts: ["are", "does", "is"], ans: 2, hint: "He → 第三人稱單數，be 動詞用 is" },
+      { q: "_____ you like dogs?（你喜歡狗嗎？）", opts: ["Does", "Are", "Do"], ans: 2, hint: "you → 用 Do" },
+      { q: "_____ she like dogs?（她喜歡狗嗎？）", opts: ["Do", "Does", "Is"], ans: 1, hint: "she → 第三人稱單數，用 Does；後面動詞用原形 like" },
+      { q: "They _____ students.（他們是學生。）", opts: ["is", "am", "are"], ans: 2, hint: "They → be 動詞用 are" },
+      { q: "I _____ my homework every day.（我每天做功課。）", opts: ["does", "do", "am"], ans: 1, hint: "I → 一般動詞用 do；肯定句直接加動詞" }
+    ]
+  },
+  'math-high': {
+    questions: [
+      { q: "24 的因數有哪些？", opts: ["2、4、6、8", "1、2、3、4、6、8、12、24", "24、48、72"], ans: 1, hint: "成對找：1×24, 2×12, 3×8, 4×6 → 因數共 8 個" },
+      { q: "7 的倍數是哪一組？", opts: ["1、7", "7、14、21、28", "7、8、9、10"], ans: 1, hint: "7×1=7, 7×2=14, 7×3=21, 7×4=28" },
+      { q: "8 和 12 的公因數有哪些？", opts: ["1、2、4", "2、4、8", "1、2、3、4、6"], ans: 0, hint: "8的因數：1,2,4,8；12的因數：1,2,3,4,6,12；共同的有：1,2,4" },
+      { q: "3 和 5 的最小公倍數是多少？", opts: ["8", "10", "15"], ans: 2, hint: "3的倍數：3,6,9,12,15…；5的倍數：5,10,15…；最小共同的是 15" },
+      { q: "每 6 天打掃、每 8 天整理，今天同時進行，最早幾天後再次同時？", opts: ["2 天", "14 天", "24 天"], ans: 2, hint: "找 6 和 8 的最小公倍數：6的倍數…6,12,18,24；8的倍數…8,16,24 → 24" },
+      { q: "16 顆餅乾和 24 顆糖果分成最多相同組數且不剩，最多幾組？", opts: ["4 組", "8 組"], ans: 1, hint: "找 16 和 24 的最大公因數：16的因數1,2,4,8,16；24的因數1,2,3,4,6,8,12,24 → 最大公因數 8" }
+    ]
+  }
+};
 
-let engState = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+const quizStates = {};
 
-function renderEngQuiz() {
-  const container = document.getElementById('eng-quiz-container');
+function getQuizState(id) {
+  if (!quizStates[id]) {
+    quizStates[id] = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+  }
+  return quizStates[id];
+}
+
+function renderQuiz(id) {
+  var container = document.getElementById('quiz-container-' + id);
   if (!container) return;
-  if (engState.done) {
-    const pct = Math.round(engState.correct / engQuestions.length * 100);
-    container.innerHTML =
-      '<div class="card" style="text-align:center; padding:32px 20px;">' +
-      '<div style="font-size:48px; margin-bottom:8px;">' + (pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚') + '</div>' +
-      '<div style="font-size:24px; font-weight:700; color:#2d6be4; margin-bottom:8px;">' + engState.correct + ' / ' + engQuestions.length + '</div>' +
-      '<div style="color:#888; margin-bottom:20px;">' + (pct >= 80 ? '太棒了！文法很熟練！' : pct >= 60 ? '不錯喔！再複習一下文法表！' : '繼續加油！先看文法總覽再練習！') + '</div>' +
-      '<button onclick="resetEngQuiz()" style="background:#2d6be4; color:#fff; border:none; padding:12px 32px; border-radius:24px; font-size:16px; cursor:pointer; font-weight:600;">再練一次</button>' +
+  var data = quizData[id];
+  if (!data) return;
+  var st = getQuizState(id);
+  var total = data.questions.length;
+  if (st.done) {
+    var pct = Math.round(st.correct / total * 100);
+    container.innerHTML = '<div class="card" style="text-align:center;padding:32px 20px;">' +
+      '<div style="font-size:48px;margin-bottom:8px;">' + (pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚') + '</div>' +
+      '<div style="font-size:24px;font-weight:700;color:#f5c518;margin-bottom:8px;">' + st.correct + ' / ' + total + '</div>' +
+      '<div style="color:#aaa;margin-bottom:20px;">' + (pct >= 80 ? '太棒了！全都答對了！' : pct >= 60 ? '不錯喔！再複習一下！' : '先看重點整理，再來練習！') + '</div>' +
+      '<button onclick="resetQuiz(\'' + id + '\')" style="background:#e63946;color:#fff;border:none;padding:12px 32px;border-radius:24px;font-size:16px;cursor:pointer;font-weight:600;">再練一次</button>' +
       '</div>';
     return;
   }
-  const q = engQuestions[engState.current];
-  let optsHtml = '';
-  q.opts.forEach(function(opt, i) {
-    let s = 'background:white; color:var(--text); border:2px solid var(--border);';
-    if (engState.answered) {
-      if (i === q.ans) s = 'background:var(--green-bg); color:var(--green); border:2px solid var(--green);';
-      else if (i === engState.wrongIdx) s = 'background:var(--red-bg); color:var(--red); border:2px solid var(--red);';
-      else s = 'background:var(--bg); color:#bbb; border:2px solid #eee;';
+  var q = data.questions[st.current];
+  var optHtml = q.opts.map(function(opt, i) {
+    var s = 'background:#1e2a3a;color:#fff;border:2px solid #2a3a4a;';
+    if (st.answered) {
+      if (i === q.ans) s = 'background:#1b5e20;color:#a5d6a7;border:2px solid #4caf50;';
+      else if (i === st.wrongIdx) s = 'background:#b71c1c;color:#ffcdd2;border:2px solid #ef5350;';
+      else s = 'background:#1a2030;color:#555;border:2px solid #2a3040;';
     }
-    optsHtml += '<button onclick="answerEng(' + i + ')" ' + (engState.answered ? 'disabled' : '') +
-      ' style="' + s + ' border-radius:10px; padding:13px 16px; font-size:15px; cursor:' + (engState.answered ? 'default' : 'pointer') + '; text-align:left; font-weight:600; transition:all 0.2s; width:100%; font-family:\'Noto Sans TC\',sans-serif;">' +
-      opt + '</button>';
-  });
-  let feedbackHtml = '';
-  if (engState.answered) {
-    const ok = engState.wrongIdx === null;
-    feedbackHtml =
-      '<div style="margin-top:14px; padding:12px; background:' + (ok ? 'var(--green-bg)' : 'var(--red-bg)') + '; border-radius:10px; font-size:14px; color:' + (ok ? 'var(--green)' : 'var(--red)') + ';">' +
+    return '<button onclick="answerQuiz(\'' + id + '\',' + i + ')" ' + (st.answered ? 'disabled' : '') +
+      ' style="' + s + 'border-radius:12px;padding:14px 16px;font-size:15px;cursor:' + (st.answered ? 'default' : 'pointer') + ';text-align:left;font-weight:600;transition:all 0.2s;width:100%;">' + opt + '</button>';
+  }).join('');
+  var feedbackHtml = '';
+  if (st.answered) {
+    var ok = st.wrongIdx === null;
+    feedbackHtml = '<div style="margin-top:16px;padding:12px;background:' + (ok ? '#1b5e20' : '#b71c1c') + ';border-radius:10px;font-size:14px;color:' + (ok ? '#a5d6a7' : '#ffcdd2') + ';">' +
       (ok ? '✅ 答對了！' : '❌ 答錯了！正確答案是「' + q.opts[q.ans] + '」') +
-      '<br><span style="color:#666; font-size:13px; margin-top:4px; display:block;">💡 ' + q.hint + '</span></div>' +
-      '<button onclick="nextEngQ()" style="width:100%; margin-top:10px; background:var(--accent); color:#fff; border:none; padding:12px; border-radius:10px; font-size:15px; cursor:pointer; font-weight:600; font-family:\'Noto Sans TC\',sans-serif;">' +
-      (engState.current < engQuestions.length - 1 ? '下一題 →' : '查看結果') + '</button>';
+      '<br><span style="color:#ffd180;font-size:13px;margin-top:4px;display:block;">💡 ' + q.hint + '</span></div>' +
+      '<button onclick="nextQuizQ(\'' + id + '\')" style="width:100%;margin-top:12px;background:#0f3460;color:#f5c518;border:none;padding:12px;border-radius:12px;font-size:16px;cursor:pointer;font-weight:600;">' +
+      (st.current < total - 1 ? '下一題 →' : '查看結果') + '</button>';
   }
-  const progW = Math.round((engState.current / engQuestions.length) * 100);
-  container.innerHTML =
-    '<div class="card" style="padding:20px; margin-bottom:12px;">' +
-    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">' +
-    '<span style="color:#888; font-size:13px;">題目 ' + (engState.current + 1) + ' / ' + engQuestions.length + '</span>' +
-    '<span style="color:var(--accent); font-size:13px;">答對 ' + engState.correct + ' 題</span></div>' +
-    '<div style="font-size:16px; color:var(--text); line-height:1.7; margin-bottom:18px; font-weight:500;">' + q.q + '</div>' +
-    '<div style="display:flex; flex-direction:column; gap:9px;">' + optsHtml + '</div>' +
-    feedbackHtml + '</div>' +
-    '<div style="padding:4px 0;"><div style="background:var(--border); border-radius:8px; height:6px; overflow:hidden;">' +
-    '<div style="background:var(--accent); height:100%; width:' + progW + '%; transition:width 0.3s;"></div></div></div>';
+  container.innerHTML = '<div class="card" style="padding:20px;margin-bottom:12px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+    '<span style="color:#888;font-size:13px;">題目 ' + (st.current + 1) + ' / ' + total + '</span>' +
+    '<span style="color:#4fc3f7;font-size:13px;">答對 ' + st.correct + ' 題</span></div>' +
+    '<div style="font-size:16px;color:#fff;line-height:1.6;margin-bottom:20px;font-weight:500;">' + q.q + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;">' + optHtml + '</div>' + feedbackHtml + '</div>' +
+    '<div style="padding:4px 0;"><div style="background:#1a2030;border-radius:8px;height:6px;overflow:hidden;">' +
+    '<div style="background:#4fc3f7;height:100%;width:' + Math.round(st.current / total * 100) + '%;transition:width 0.3s;"></div></div></div>';
 }
 
-function answerEng(idx) {
-  if (engState.answered) return;
-  const q = engQuestions[engState.current];
-  engState.answered = true;
-  if (idx === q.ans) { engState.correct++; engState.wrongIdx = null; }
-  else { engState.wrongIdx = idx; }
-  renderEngQuiz();
+function answerQuiz(id, idx) {
+  var st = getQuizState(id);
+  if (st.answered) return;
+  var q = quizData[id].questions[st.current];
+  st.answered = true;
+  if (idx === q.ans) { st.correct++; st.wrongIdx = null; }
+  else { st.wrongIdx = idx; }
+  renderQuiz(id);
 }
 
-function nextEngQ() {
-  if (engState.current < engQuestions.length - 1) {
-    engState.current++;
-    engState.answered = false;
-    engState.wrongIdx = null;
+function nextQuizQ(id) {
+  var st = getQuizState(id);
+  var total = quizData[id].questions.length;
+  if (st.current < total - 1) {
+    st.current++;
+    st.answered = false;
+    st.wrongIdx = null;
   } else {
-    engState.done = true;
+    st.done = true;
   }
-  renderEngQuiz();
+  renderQuiz(id);
 }
 
-function resetEngQuiz() {
-  engState = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
-  renderEngQuiz();
+function resetQuiz(id) {
+  quizStates[id] = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+  renderQuiz(id);
 }
 
 function switchEngTab(name, btn) {
@@ -2367,86 +2388,7 @@ function switchEngTab(name, btn) {
   document.querySelectorAll('#section-english-high .tab-btn').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'eng-quiz') renderEngQuiz();
-}
-
-// ── Math High Grade: Factors & Multiples quiz ──
-const mathHighQuestions = [
-  { q: "24 的因數有哪些？", opts: ["2、4、6、8", "1、2、3、4、6、8、12、24", "24、48、72"], ans: 1, hint: "成對找：1×24, 2×12, 3×8, 4×6 → 因數共 8 個" },
-  { q: "7 的倍數是哪一組？", opts: ["1、7", "7、14、21、28", "7、8、9、10"], ans: 1, hint: "7×1=7, 7×2=14, 7×3=21, 7×4=28" },
-  { q: "8 和 12 的公因數有哪些？", opts: ["1、2、4", "2、4、8", "1、2、3、4、6"], ans: 0, hint: "8的因數：1,2,4,8；12的因數：1,2,3,4,6,12；共同的有：1,2,4" },
-  { q: "3 和 5 的最小公倍數是多少？", opts: ["8", "10", "15"], ans: 2, hint: "3的倍數：3,6,9,12,15…；5的倍數：5,10,15…；最小共同的是 15" },
-  { q: "每 6 天打掃、每 8 天整理，今天同時進行，最早幾天後再次同時？", opts: ["2 天", "14 天", "24 天"], ans: 2, hint: "找 6 和 8 的最小公倍數：6的倍數…6,12,18,24；8的倍數…8,16,24 → 24" },
-  { q: "16 顆餅乾和 24 顆糖果分成最多相同組數且不剩，最多幾組？", opts: ["4 組", "8 組"], ans: 1, hint: "找 16 和 24 的最大公因數：16的因數1,2,4,8,16；24的因數1,2,3,4,6,8,12,24 → 最大公因數 8" }
-];
-
-var mathHighState = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
-
-function renderMathHighQuiz() {
-  var container = document.getElementById('math-high-quiz-container');
-  if (!container) return;
-  if (mathHighState.done) {
-    var pct = Math.round(mathHighState.correct / mathHighQuestions.length * 100);
-    container.innerHTML = '<div class="card" style="text-align:center;padding:32px 20px;">' +
-      '<div style="font-size:48px;margin-bottom:8px;">' + (pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚') + '</div>' +
-      '<div style="font-size:24px;font-weight:700;color:#f5c518;margin-bottom:8px;">' + mathHighState.correct + ' / ' + mathHighQuestions.length + '</div>' +
-      '<div style="color:#aaa;margin-bottom:20px;">' + (pct >= 80 ? '太棒了！因數倍數都很熟練！' : pct >= 60 ? '不錯喔！再複習一下口訣！' : '先看重點整理，再來練習！') + '</div>' +
-      '<button onclick="resetMathHighQuiz()" style="background:#e63946;color:#fff;border:none;padding:12px 32px;border-radius:24px;font-size:16px;cursor:pointer;font-weight:600;">再練一次</button></div>';
-    return;
-  }
-  var q = mathHighQuestions[mathHighState.current];
-  var optHtml = q.opts.map(function(opt, i) {
-    var st = 'background:#1e2a3a;color:#fff;border:2px solid #2a3a4a;';
-    if (mathHighState.answered) {
-      if (i === q.ans) st = 'background:#1b5e20;color:#a5d6a7;border:2px solid #4caf50;';
-      else if (i === mathHighState.wrongIdx) st = 'background:#b71c1c;color:#ffcdd2;border:2px solid #ef5350;';
-      else st = 'background:#1a2030;color:#555;border:2px solid #2a3040;';
-    }
-    return '<button onclick="answerMathHigh(' + i + ')" ' + (mathHighState.answered ? 'disabled' : '') +
-      ' style="' + st + 'border-radius:12px;padding:14px 16px;font-size:15px;cursor:' + (mathHighState.answered ? 'default' : 'pointer') + ';text-align:left;font-weight:600;transition:all 0.2s;width:100%;">' + opt + '</button>';
-  }).join('');
-  var feedbackHtml = '';
-  if (mathHighState.answered) {
-    var ok = mathHighState.wrongIdx === null;
-    feedbackHtml = '<div style="margin-top:16px;padding:12px;background:' + (ok ? '#1b5e20' : '#b71c1c') + ';border-radius:10px;font-size:14px;color:' + (ok ? '#a5d6a7' : '#ffcdd2') + ';">' +
-      (ok ? '✅ 答對了！' : '❌ 答錯了！正確答案是「' + q.opts[q.ans] + '」') +
-      '<br><span style="color:#ffd180;font-size:13px;margin-top:4px;display:block;">💡 ' + q.hint + '</span></div>' +
-      '<button onclick="nextMathHighQ()" style="width:100%;margin-top:12px;background:#0f3460;color:#f5c518;border:none;padding:12px;border-radius:12px;font-size:16px;cursor:pointer;font-weight:600;">' +
-      (mathHighState.current < mathHighQuestions.length - 1 ? '下一題 →' : '查看結果') + '</button>';
-  }
-  container.innerHTML = '<div class="card" style="padding:20px;margin-bottom:12px;">' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
-    '<span style="color:#888;font-size:13px;">題目 ' + (mathHighState.current + 1) + ' / ' + mathHighQuestions.length + '</span>' +
-    '<span style="color:#4fc3f7;font-size:13px;">答對 ' + mathHighState.correct + ' 題</span></div>' +
-    '<div style="font-size:16px;color:#fff;line-height:1.6;margin-bottom:20px;font-weight:500;">' + q.q + '</div>' +
-    '<div style="display:flex;flex-direction:column;gap:10px;">' + optHtml + '</div>' + feedbackHtml + '</div>' +
-    '<div style="padding:4px 0;"><div style="background:#1a2030;border-radius:8px;height:6px;overflow:hidden;">' +
-    '<div style="background:#f5c518;height:100%;width:' + Math.round(mathHighState.current / mathHighQuestions.length * 100) + '%;transition:width 0.3s;"></div></div></div>';
-}
-
-function answerMathHigh(idx) {
-  if (mathHighState.answered) return;
-  var q = mathHighQuestions[mathHighState.current];
-  mathHighState.answered = true;
-  if (idx === q.ans) { mathHighState.correct++; mathHighState.wrongIdx = null; }
-  else { mathHighState.wrongIdx = idx; }
-  renderMathHighQuiz();
-}
-
-function nextMathHighQ() {
-  if (mathHighState.current < mathHighQuestions.length - 1) {
-    mathHighState.current++;
-    mathHighState.answered = false;
-    mathHighState.wrongIdx = null;
-  } else {
-    mathHighState.done = true;
-  }
-  renderMathHighQuiz();
-}
-
-function resetMathHighQuiz() {
-  mathHighState = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
-  renderMathHighQuiz();
+  if (name === 'eng-quiz') renderQuiz('english-high');
 }
 
 function switchMathHighTab(name, btn) {
@@ -2454,7 +2396,7 @@ function switchMathHighTab(name, btn) {
   document.querySelectorAll('#section-math-high .tab-btn').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'math-high-quiz') renderMathHighQuiz();
+  if (name === 'math-high-quiz') renderQuiz('math-high');
 }
 </script>
 </body>
