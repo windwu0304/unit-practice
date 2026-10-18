@@ -250,6 +250,71 @@
     .shift-wrap input { width:120px; }
     .shift-result { font-size:24px; padding:20px; }
   }
+
+  /* ── Subject / Grade navigation ── */
+  .subject-bar {
+    background: #1a1a2e;
+    padding: 8px 0 0;
+  }
+  .subject-inner {
+    display: flex;
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 4px;
+    padding: 0 12px;
+  }
+  .subject-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    background: #2a2a4e;
+    color: #888;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .subject-btn.active {
+    background: #e63946;
+    color: #fff;
+  }
+  .grade-bar {
+    background: #16213e;
+    padding: 6px 0;
+    border-bottom: 2px solid #0f3460;
+  }
+  .grade-inner {
+    display: flex;
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 6px;
+    padding: 0 12px;
+  }
+  .grade-btn {
+    flex: 1;
+    padding: 7px;
+    border: 2px solid #0f3460;
+    border-radius: 8px;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .grade-btn.active {
+    background: #0f3460;
+    color: #f5c518;
+    border-color: #f5c518;
+  }
+  .content-section {
+    display: none;
+  }
+  .content-section.active {
+    display: block;
+  }
+
 </style>
 </head>
 <body>
@@ -257,8 +322,7 @@
 <header>
   <div class="header-inner">
     <div>
-      <div class="header-title">魯夫的數學修練之旅</div>
-      <div class="header-sub">小學四年級・長度・重量・容量・時間・面積・體積</div>
+      <div class="header-title">魯夫的學習修練之旅</div>
     </div>
   </div>
   <!-- 全域進度列 -->
@@ -271,6 +335,20 @@
   </div>
 </header>
 
+<div class="subject-bar">
+  <div class="subject-inner">
+    <button class="subject-btn active" data-subject="math" onclick="switchSubject('math',this)">數學</button>
+    <button class="subject-btn" data-subject="english" onclick="switchSubject('english',this)">英文</button>
+  </div>
+</div>
+<div class="grade-bar">
+  <div class="grade-inner">
+    <button class="grade-btn active" data-grade="middle" onclick="switchGrade('middle',this)">中年級</button>
+    <button class="grade-btn" data-grade="high" onclick="switchGrade('high',this)">高年級</button>
+  </div>
+</div>
+
+<div class="content-section active" id="section-math-middle">
 <div class="tab-bar">
   <div class="tab-inner">
     <button class="tab-btn active" onclick="switchTab('quiz',this)">練習題</button>
@@ -645,6 +723,175 @@
     <button class="btn-primary" style="width:100%" onclick="restartQuiz()">再練一次 🔄</button>
   </div>
 </div>
+
+</div><!-- /section-math-middle -->
+
+
+<div class="content-section" id="section-math-high">
+  <div style="text-align:center; padding: 60px 20px; color: #888;">
+    <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
+    <div style="font-size: 20px; font-weight: 600; color: #f5c518;">數學 · 高年級</div>
+    <div style="margin-top: 8px; font-size: 14px;">即將推出 — 五六年級數學練習</div>
+  </div>
+</div>
+
+<div class="content-section" id="section-english-middle">
+  <div style="text-align:center; padding: 60px 20px; color: #888;">
+    <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
+    <div style="font-size: 20px; font-weight: 600; color: #f5c518;">英文 · 中年級</div>
+    <div style="margin-top: 8px; font-size: 14px;">即將推出 — 三四年級英文練習</div>
+  </div>
+</div>
+
+<div class="content-section" id="section-english-high">
+<div class="tab-bar">
+  <div class="tab-inner">
+    <button class="tab-btn active" onclick="switchEngTab('eng-ref',this)">文法總覽</button>
+    <button class="tab-btn" onclick="switchEngTab('eng-quiz',this)">練習題</button>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="section active" id="tab-eng-ref">
+  <div class="card" style="margin:0 0 16px;">
+    <h2 style="color:#1a5f7a; font-size:17px; margin-bottom:14px;">一、This / That / These / Those</h2>
+    <p style="color:var(--text-mid); margin-bottom:12px; font-size:14px;">先記住兩個觀念：<strong>遠近 + 單複數</strong></p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <div style="background:#eef7fb; border:1.5px solid #9ecfe0; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a5f7a;">This</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">這個 ・ 近 ・ 單數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">This is an apple.</div>
+      </div>
+      <div style="background:#eef8f3; border:1.5px solid #9ed4be; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a7f4b;">That</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">那個 ・ 遠 ・ 單數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">That is an apple.</div>
+      </div>
+      <div style="background:#eef7fb; border:1.5px solid #9ecfe0; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a5f7a;">These</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">這些 ・ 近 ・ 複數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">These are apples.</div>
+      </div>
+      <div style="background:#eef8f3; border:1.5px solid #9ed4be; border-radius:10px; padding:14px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#1a7f4b;">Those</div>
+        <div style="font-size:12px; color:#888; margin:4px 0;">那些 ・ 遠 ・ 複數</div>
+        <div style="font-size:13px; color:#333; font-style:italic;">Those are apples.</div>
+      </div>
+    </div>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:12px; font-size:14px; border:1px solid var(--border);">
+      <tr style="background:#eef7fb;">
+        <th style="padding:8px; text-align:left; border:1px solid var(--border);"></th>
+        <th style="padding:8px; border:1px solid var(--border); color:#1a5f7a;">單數（1 個）</th>
+        <th style="padding:8px; border:1px solid var(--border); color:#1a5f7a;">複數（2 個以上）</th>
+      </tr>
+      <tr>
+        <td style="padding:8px; font-weight:700; color:#1a5f7a; border:1px solid var(--border);">近</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>This</strong> is</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>These</strong> are</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:8px; font-weight:700; color:#1a7f4b; border:1px solid var(--border);">遠</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>That</strong> is</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center;"><strong>Those</strong> are</td>
+      </tr>
+    </table>
+    <div class="info-box">💡 口訣：This / That → 一個，配 is；These / Those → 多個，配 are</div>
+  </div>
+
+  <div class="card" style="margin:0 0 16px;">
+    <h2 style="color:#1a5f7a; font-size:17px; margin-bottom:14px;">二、人稱代名詞搭配總表</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px; border:1px solid var(--border);">
+      <tr style="background:#eef7fb;">
+        <th style="padding:8px 6px; text-align:left; border:1px solid var(--border);">主詞</th>
+        <th style="padding:8px 6px; border:1px solid var(--border); text-align:center; color:#2d6be4;">be 動詞</th>
+        <th style="padding:8px 6px; border:1px solid var(--border); text-align:center; color:#2d6be4;">助動詞</th>
+        <th style="padding:8px 6px; border:1px solid var(--border); text-align:center; color:#2d6be4;">擁有</th>
+      </tr>
+      <tr>
+        <td style="padding:7px 6px; border:1px solid var(--border);">I（我）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">am</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:7px 6px; border:1px solid var(--border);">You（你/你們）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">are</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+      <tr style="background:#fdf3f2;">
+        <td style="padding:7px 6px; border:1px solid var(--border); color:#c0392b;">He（他）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700; color:#c0392b;">is</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">does</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">has</td>
+      </tr>
+      <tr style="background:#fdf3f2;">
+        <td style="padding:7px 6px; border:1px solid var(--border); color:#c0392b;">She（她）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700; color:#c0392b;">is</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">does</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">has</td>
+      </tr>
+      <tr style="background:#fdf3f2;">
+        <td style="padding:7px 6px; border:1px solid var(--border); color:#c0392b;">It（它）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700; color:#c0392b;">is</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">does</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:600; color:#c0392b;">has</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:7px 6px; border:1px solid var(--border);">We（我們）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">are</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 6px; border:1px solid var(--border);">They（他們）</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">are</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">do</td>
+        <td style="padding:7px 6px; border:1px solid var(--border); text-align:center;">have</td>
+      </tr>
+    </table>
+    <div class="info-box" style="margin-top:12px;">
+      🔑 He / She / It → <strong>is / does / has</strong><br>
+      🔑 I / You / We / They → <strong>am 或 are / do / have</strong>
+    </div>
+  </div>
+
+  <div class="card" style="margin:0 0 16px;">
+    <h2 style="color:#1a5f7a; font-size:17px; margin-bottom:14px;">三、特別注意：Does 後動詞變原形！</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px; border:1px solid var(--border);">
+      <tr style="background:#eef7fb;">
+        <th style="padding:8px; border:1px solid var(--border); text-align:center; color:#1a7f4b;">✅ 正確</th>
+        <th style="padding:8px; border:1px solid var(--border); text-align:center; color:#c0392b;">❌ 錯誤</th>
+      </tr>
+      <tr>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic;">Does he <strong>like</strong> apples?</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic; text-decoration:line-through; color:#c0392b;">Does he likes apples?</td>
+      </tr>
+      <tr style="background:var(--bg);">
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic;">Does she <strong>have</strong> a pen?</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic; text-decoration:line-through; color:#c0392b;">Does she has a pen?</td>
+      </tr>
+      <tr>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic;">She doesn't <strong>like</strong> cats.</td>
+        <td style="padding:8px; border:1px solid var(--border); text-align:center; font-style:italic; text-decoration:line-through; color:#c0392b;">She doesn't likes cats.</td>
+      </tr>
+    </table>
+    <div class="info-box" style="margin-top:12px;">💡 does 已帶有第三人稱變化，後面動詞不再加 s！</div>
+  </div>
+</div>
+
+<div class="main">
+<div class="section" id="tab-eng-quiz">
+  <div id="eng-quiz-container" style="padding:4px 0;">
+    <!-- dynamically rendered by JS -->
+  </div>
+</div>
+</div>
+
+</div><!-- /section-english-high -->
+
+
 
 <script>
 // ── State ──
@@ -1787,6 +2034,130 @@ function sendLineNotify(pct) {
 }
 
 loadRecord(); loadPair(); loadFrac(); calcShift();
+
+// ── Subject / Grade switching ──
+let currentSubject = 'math';
+let currentGrade = 'middle';
+
+function switchSubject(subject, btn) {
+  currentSubject = subject;
+  document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateContentSection();
+}
+
+function switchGrade(grade, btn) {
+  currentGrade = grade;
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateContentSection();
+}
+
+function updateContentSection() {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('section-' + currentSubject + '-' + currentGrade);
+  if (target) target.classList.add('active');
+  if (currentSubject === 'english' && currentGrade === 'high') {
+    renderEngQuiz();
+  }
+}
+
+// ── English quiz ──
+const engQuestions = [
+  { q: "_____ is my pencil.（這是我的鉛筆。）", opts: ["This", "These", "Those"], ans: 0, hint: "is → 單數，近的用 This" },
+  { q: "_____ are my books.（這些是我的書。）", opts: ["That", "These", "This"], ans: 1, hint: "are → 複數，近的用 These" },
+  { q: "She _____ a cat.（她有一隻貓。）", opts: ["have", "has", "is"], ans: 1, hint: "She → 第三人稱單數，用 has" },
+  { q: "He _____ happy.（他很開心。）", opts: ["are", "does", "is"], ans: 2, hint: "He → 第三人稱單數，be 動詞用 is" },
+  { q: "_____ you like dogs?（你喜歡狗嗎？）", opts: ["Does", "Are", "Do"], ans: 2, hint: "you → 用 Do" },
+  { q: "_____ she like dogs?（她喜歡狗嗎？）", opts: ["Do", "Does", "Is"], ans: 1, hint: "she → 第三人稱單數，用 Does；後面動詞用原形 like" },
+  { q: "They _____ students.（他們是學生。）", opts: ["is", "am", "are"], ans: 2, hint: "They → be 動詞用 are" },
+  { q: "I _____ my homework every day.（我每天做功課。）", opts: ["does", "do", "am"], ans: 1, hint: "I → 一般動詞用 do；肯定句直接加動詞" }
+];
+
+let engState = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+
+function renderEngQuiz() {
+  const container = document.getElementById('eng-quiz-container');
+  if (!container) return;
+  if (engState.done) {
+    const pct = Math.round(engState.correct / engQuestions.length * 100);
+    container.innerHTML =
+      '<div class="card" style="text-align:center; padding:32px 20px;">' +
+      '<div style="font-size:48px; margin-bottom:8px;">' + (pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚') + '</div>' +
+      '<div style="font-size:24px; font-weight:700; color:#2d6be4; margin-bottom:8px;">' + engState.correct + ' / ' + engQuestions.length + '</div>' +
+      '<div style="color:#888; margin-bottom:20px;">' + (pct >= 80 ? '太棒了！文法很熟練！' : pct >= 60 ? '不錯喔！再複習一下文法表！' : '繼續加油！先看文法總覽再練習！') + '</div>' +
+      '<button onclick="resetEngQuiz()" style="background:#2d6be4; color:#fff; border:none; padding:12px 32px; border-radius:24px; font-size:16px; cursor:pointer; font-weight:600;">再練一次</button>' +
+      '</div>';
+    return;
+  }
+  const q = engQuestions[engState.current];
+  let optsHtml = '';
+  q.opts.forEach(function(opt, i) {
+    let s = 'background:white; color:var(--text); border:2px solid var(--border);';
+    if (engState.answered) {
+      if (i === q.ans) s = 'background:var(--green-bg); color:var(--green); border:2px solid var(--green);';
+      else if (i === engState.wrongIdx) s = 'background:var(--red-bg); color:var(--red); border:2px solid var(--red);';
+      else s = 'background:var(--bg); color:#bbb; border:2px solid #eee;';
+    }
+    optsHtml += '<button onclick="answerEng(' + i + ')" ' + (engState.answered ? 'disabled' : '') +
+      ' style="' + s + ' border-radius:10px; padding:13px 16px; font-size:15px; cursor:' + (engState.answered ? 'default' : 'pointer') + '; text-align:left; font-weight:600; transition:all 0.2s; width:100%; font-family:\'Noto Sans TC\',sans-serif;">' +
+      opt + '</button>';
+  });
+  let feedbackHtml = '';
+  if (engState.answered) {
+    const ok = engState.wrongIdx === null;
+    feedbackHtml =
+      '<div style="margin-top:14px; padding:12px; background:' + (ok ? 'var(--green-bg)' : 'var(--red-bg)') + '; border-radius:10px; font-size:14px; color:' + (ok ? 'var(--green)' : 'var(--red)') + ';">' +
+      (ok ? '✅ 答對了！' : '❌ 答錯了！正確答案是「' + q.opts[q.ans] + '」') +
+      '<br><span style="color:#666; font-size:13px; margin-top:4px; display:block;">💡 ' + q.hint + '</span></div>' +
+      '<button onclick="nextEngQ()" style="width:100%; margin-top:10px; background:var(--accent); color:#fff; border:none; padding:12px; border-radius:10px; font-size:15px; cursor:pointer; font-weight:600; font-family:\'Noto Sans TC\',sans-serif;">' +
+      (engState.current < engQuestions.length - 1 ? '下一題 →' : '查看結果') + '</button>';
+  }
+  const progW = Math.round((engState.current / engQuestions.length) * 100);
+  container.innerHTML =
+    '<div class="card" style="padding:20px; margin-bottom:12px;">' +
+    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">' +
+    '<span style="color:#888; font-size:13px;">題目 ' + (engState.current + 1) + ' / ' + engQuestions.length + '</span>' +
+    '<span style="color:var(--accent); font-size:13px;">答對 ' + engState.correct + ' 題</span></div>' +
+    '<div style="font-size:16px; color:var(--text); line-height:1.7; margin-bottom:18px; font-weight:500;">' + q.q + '</div>' +
+    '<div style="display:flex; flex-direction:column; gap:9px;">' + optsHtml + '</div>' +
+    feedbackHtml + '</div>' +
+    '<div style="padding:4px 0;"><div style="background:var(--border); border-radius:8px; height:6px; overflow:hidden;">' +
+    '<div style="background:var(--accent); height:100%; width:' + progW + '%; transition:width 0.3s;"></div></div></div>';
+}
+
+function answerEng(idx) {
+  if (engState.answered) return;
+  const q = engQuestions[engState.current];
+  engState.answered = true;
+  if (idx === q.ans) { engState.correct++; engState.wrongIdx = null; }
+  else { engState.wrongIdx = idx; }
+  renderEngQuiz();
+}
+
+function nextEngQ() {
+  if (engState.current < engQuestions.length - 1) {
+    engState.current++;
+    engState.answered = false;
+    engState.wrongIdx = null;
+  } else {
+    engState.done = true;
+  }
+  renderEngQuiz();
+}
+
+function resetEngQuiz() {
+  engState = { current: 0, correct: 0, answered: false, done: false, wrongIdx: null };
+  renderEngQuiz();
+}
+
+function switchEngTab(name, btn) {
+  document.querySelectorAll('#section-english-high .section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('#section-english-high .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'eng-quiz') renderEngQuiz();
+}
 </script>
 </body>
 </html>
