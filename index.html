@@ -2246,6 +2246,15 @@ function switchSubject(subject, btn) {
   currentSubject = subject;
   document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  const middleBtn = document.querySelector('.grade-btn[data-grade="middle"]');
+  if (subject === 'english') {
+    middleBtn.style.display = 'none';
+    currentGrade = 'high';
+    document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.grade-btn[data-grade="high"]').classList.add('active');
+  } else {
+    middleBtn.style.display = '';
+  }
   updateContentSection();
 }
 
